@@ -1,0 +1,81 @@
+{
+    "common": {
+        "name": "valuetrackerovertime",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Value-Tracker over time",
+        "titleLang": {
+            "en": "Value-Tracker over time",
+            "de": "Value-Tracker im Laufe der Zeit",
+            "ru": "Отслеживание ценности с течением времени",
+            "pt": "Value-Tracker ao longo do tempo",
+            "nl": "Value-Tracker in de loop van de tijd",
+            "fr": "Value-Tracker au fil du temps",
+            "it": "Value-Tracker nel tempo",
+            "es": "Value-Tracker a lo largo del tiempo",
+            "pl": "Value-Tracker w czasie",
+            "zh-cn": "随时间推移的价值跟踪器"
+        },
+        "desc": {
+            "en": "Tracks number-changes over timepsans like hours/days/years ...",
+            "de": "Verfolgt Zahlenänderungen über Zeitspannen wie Stunden / Tage / Jahre ...",
+            "ru": "Отслеживает изменения числа с течением времени, например, часы / дни / годы ...",
+            "pt": "Rastreia mudanças de número ao longo do tempo, como horas / dias / anos ...",
+            "nl": "Houdt nummerwijzigingen bij over tijdsintervallen zoals uren / dagen / jaren ...",
+            "fr": "Suit les changements de nombre au fil du temps, comme des heures / jours / années ...",
+            "it": "Tiene traccia dei cambiamenti di numero su timepsans come ore / giorni / anni ...",
+            "es": "Realiza un seguimiento de los cambios de número a lo largo del tiempo, como horas / días / años ...",
+            "pl": "Śledzi zmiany liczby w przedziałach czasowych, takich jak godziny / dni / lata ...",
+            "zh-cn": "跟踪小时数，天数/年数等时标的数字变化..."
+        },
+        "authors": [
+            "Omega236 <general.of.omega@googlemail.com>"
+        ],
+        "keywords": [
+            "Tracker",
+            "statistic",
+            "history",
+            "ioBroker",
+            "log data"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "valuetrackerovertime.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/Omega236/ioBroker.valuetrackerovertime/master/admin/valuetrackerovertime.png",
+        "readme": "https://github.com/Omega236/ioBroker.valuetrackerovertime/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "storage",
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "poll",
+        "materialize": true,
+        "supportCustoms": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ]
+    },
+    "native": {
+        "option1": true,
+        "option2": "42"
+    },
+    "objects": [],
+    "instanceObjects": []
+}
