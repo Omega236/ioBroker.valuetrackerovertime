@@ -1,6 +1,6 @@
 {
   "name": "iobroker.valuetrackerovertime",
-  "version": "0.0.1",
+  "version": "0.3.1",
   "description": "Tracks number-changes over timepsans like hours/days/years ...",
   "author": {
     "name": "Omega236",
@@ -25,7 +25,8 @@
     "url": "https://github.com/Omega236/ioBroker.valuetrackerovertime"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.4.0"
+    "@iobroker/adapter-core": "^2.4.0",
+    "node-cron": "^2.0.3"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.4.0",
