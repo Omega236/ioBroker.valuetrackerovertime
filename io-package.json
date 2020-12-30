@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.0.1",
+        "version": "0.3.1",
         "news": {
+            "0.3.1": {
+              "en": "first public",
+              "de": "erste öffentliche Version"
+            },
             "0.0.1": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
@@ -19,7 +23,7 @@
         "title": "Value-Tracker over time",
         "titleLang": {
             "en": "Value-Tracker over time",
-            "de": "Value-Tracker im Laufe der Zeit",
+            "de": "Value-Tracker over time",
             "ru": "Отслеживание ценности с течением времени",
             "pt": "Value-Tracker ao longo do tempo",
             "nl": "Value-Tracker in de loop van de tijd",
@@ -73,9 +77,21 @@
         ]
     },
     "native": {
-        "option1": true,
-        "option2": "42"
-    },
-    "objects": [],
-    "instanceObjects": []
+    "generateDPDays": 30,
+    "detailed_days": false,
+    "detailed_weeks": true,
+    "detailed_months": true,
+    "detailed_years": true,
+    "before_minutes": -1,
+    "before_hours": -1,
+    "before_days": 7,
+    "before_weeks": 4,
+    "before_months": 3,
+    "before_quarters": 4,
+    "before_years": 3,
+    "counterResetDetection": true,
+    "counterResetDetetion_CountAfterReset":1
+  },
+  "objects": [],
+  "instanceObjects": []
 }
