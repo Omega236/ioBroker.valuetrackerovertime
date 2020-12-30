@@ -14,7 +14,7 @@
 
 ## valuetrackerovertime adapter for ioBroker
 
-Tracks number-changes over timepsans like hours/days/years ...
+Tracks number-changes over timespans like hours/days/years ...
 
 ## Developer manual
 This section is intended for the developer. It can be deleted later
