@@ -538,37 +538,37 @@ class valuetrackerovertime extends utils.Adapter {
   * @param {Date} theDate
   */
     async _getDateTimeInfoForPrevious(oS, TimeFrame, theDate, beforeZähler) {
-
+        const Newdate = new Date(theDate);
         let theDateInfo = "";
         if (TimeFrame == TimeFrames.Minute) {
-            theDate.setMinutes(theDate.getMinutes() - beforeZähler);
-            theDateInfo = theDate.toLocaleTimeString();
+            Newdate.setMinutes(Newdate.getMinutes() - beforeZähler);
+            theDateInfo = "minute " + Newdate.toLocaleTimeString();
         } else if (TimeFrame == TimeFrames.Hour) {
-            theDate.setHours(theDate.getHours() - beforeZähler);
-            theDateInfo = theDate.toLocaleTimeString();
+            Newdate.setHours(Newdate.getHours() - beforeZähler);
+            theDateInfo = "hour " + Newdate.toLocaleTimeString();
 
         } else if (TimeFrame == TimeFrames.Day) {
-            theDate.setDate(theDate.getDate() - beforeZähler);
-            theDateInfo = theDate.toDateString();
+            Newdate.setDate(Newdate.getDate() - beforeZähler);
+            theDateInfo = Newdate.toLocaleDateString();
         } else if (TimeFrame == TimeFrames.Week) {
-            theDate.setDate(theDate.getDate() - 7 * beforeZähler);
-            theDateInfo = "KW_" + this._getKW(theDate);
+            Newdate.setDate(Newdate.getDate() - 7 * beforeZähler);
+            theDateInfo = "KW_" + this._getKW(Newdate);
         }
         else if (TimeFrame == TimeFrames.Month) {
-            theDate.setMonth(theDate.getMonth() - beforeZähler);
-            const MonthString = theDate.toLocaleString("en-us", { month: "long" });
-            theDateInfo = this.pad(theDate.getMonth() + 1, 2) + "_" + MonthString;
+            Newdate.setMonth(Newdate.getMonth() - beforeZähler);
+            const MonthString = Newdate.toLocaleString("en-us", { month: "long" });
+            theDateInfo = this.pad(Newdate.getMonth() + 1, 2) + "_" + MonthString;
         }
         else if (TimeFrame == TimeFrames.Quarter) {
-            theDate.setMonth(theDate.getMonth() - (beforeZähler * 3));
+            Newdate.setMonth(Newdate.getMonth() - (beforeZähler * 3));
 
-            theDateInfo = "quarter " + this._getQuarter(theDate);
+            theDateInfo = "quarter " + this._getQuarter(Newdate);
         }
 
         else if (TimeFrame == TimeFrames.Year) {
-            theDate.setFullYear(theDate.getFullYear() - beforeZähler);
+            Newdate.setFullYear(Newdate.getFullYear() - beforeZähler);
 
-            theDateInfo = theDate.getFullYear().toString();
+            theDateInfo = Newdate.getFullYear().toString();
         }
         return "Data from " + theDateInfo;
     }

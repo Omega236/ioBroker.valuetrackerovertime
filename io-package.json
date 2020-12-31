@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.3.2",
+        "version": "0.3.3",
         "news": {
+          "0.3.3": {
+            "en": "bugfix date object changed",
+            "de": "bugfix date object changed"
+          },
           "0.3.2": {
             "en": "remove selectID.js in index_m.html",
             "de": "selectID.js aus index_m.html entfernt"
