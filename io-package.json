@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.3.3",
+        "version": "0.3.4",
         "news": {
+          "0.3.4": {
+            "en": "Check for duplicate Alias and reduce recalcs on start-value changed",
+            "de": "Check for duplicate Alias and reduce recalcs on start-value changed"
+          },
           "0.3.3": {
             "en": "bugfix date object changed",
             "de": "bugfix date object changed"

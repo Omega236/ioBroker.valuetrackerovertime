@@ -1,6 +1,6 @@
 {
   "name": "iobroker.valuetrackerovertime",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Tracks number-changes over timepsans like hours/days/years ...",
   "author": {
     "name": "Omega236",
