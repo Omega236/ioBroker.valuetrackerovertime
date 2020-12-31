@@ -139,6 +139,18 @@ class valuetrackerovertime extends utils.Adapter {
                     this.dicDatas[oS.id] = oS;
                 }
 
+                //Check for duplicate Alias
+                for (const oneoSIdtoCheck in this.dicDatas) {
+                    /**@type {ObjectSettings} */
+                    const oStoCheck = this.dicDatas[oneoSIdtoCheck];
+                    if (oStoCheck.alias.toLowerCase() == oS.alias.toLowerCase() && oStoCheck.id != oS.id) {
+                        delete this.dicDatas[oS.id];
+                        this.log.error("The Datapoint " + oS.id + " have the same Alias (" + oS.alias + ") as the Datapoint " + oStoCheck.id + ", " + oS.id + " is now disabled");
+                        return;
+                    }
+
+                }
+
 
                 await this._generateTreeStructure(oS);
                 this.subscribeStates(oS.alias + "._startValues.*");
@@ -205,16 +217,16 @@ class valuetrackerovertime extends utils.Adapter {
   * @param {ioBroker.State | null | undefined} state
   */
     async onStateChange(id, state) {
-        if (state) {
-            if (id.startsWith(this.namespace)) {
+        if (state && !state.ack) {
+            if (id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
+                const TimeFrame = id.substring(id.lastIndexOf("_") + 1);
                 const idsplit = id.split(".");
-                const idcounter = idsplit.slice(0, 3).join(".") + "._counterID";
-                const idoS = await this.getStateAsync(idcounter);
-                if (idoS) {
-                    const oS = this.dicDatas[idoS.val];
-                    if (oS) {
-                        await this._publishCurrentValue(oS, new Date(), await this._getCurrentValue(oS));
-
+                for (const oneoSID in this.dicDatas) {
+                    /**@type {ObjectSettings} */
+                    const oS = this.dicDatas[oneoSID];
+                    if (oS.alias == idsplit[2]) {
+                        await this._calcCurrentTimeFrameValue(oS, new Date(), oS.lastGoodValue, TimeFrame);
+                        await this.setStateAsync(id, Number(state.val), true);
                     }
                 }
 
