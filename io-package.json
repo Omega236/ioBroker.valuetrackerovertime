@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.3.4",
+        "version": "0.3.5",
         "news": {
+          "0.3.5": {
+            "en": "reset Detection optimize and bugfix only ack",
+            "de": "reset Detection optimize and bugfix only ack"
+          },
           "0.3.4": {
             "en": "Check for duplicate Alias and reduce recalcs on start-value changed",
             "de": "Check for duplicate Alias and reduce recalcs on start-value changed"

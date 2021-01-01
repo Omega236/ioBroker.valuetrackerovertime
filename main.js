@@ -217,14 +217,15 @@ class valuetrackerovertime extends utils.Adapter {
   * @param {ioBroker.State | null | undefined} state
   */
     async onStateChange(id, state) {
-        if (state && !state.ack) {
-            if (id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
+        if (state) {
+            if (!state.ack && id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
                 const TimeFrame = id.substring(id.lastIndexOf("_") + 1);
                 const idsplit = id.split(".");
                 for (const oneoSID in this.dicDatas) {
                     /**@type {ObjectSettings} */
                     const oS = this.dicDatas[oneoSID];
                     if (oS.alias == idsplit[2]) {
+                        this.log.warn(id + " changed, recalc Timeframe, old-Value: " + this._getStartValue(oS, TimeFrame, 0) + " new-value: " + state.val);
                         await this._calcCurrentTimeFrameValue(oS, new Date(), oS.lastGoodValue, TimeFrame);
                         await this.setStateAsync(id, Number(state.val), true);
                     }
@@ -321,7 +322,7 @@ class valuetrackerovertime extends utils.Adapter {
                     oS.counterResetDetetion_CurrentCountAfterReset += 1;
                     oS.lastWrongValue = current_value;
                 }
-                if (oS.counterResetDetetion_CurrentCountAfterReset < oS.counterResetDetetion_CountAfterReset) {
+                if (oS.counterResetDetetion_CurrentCountAfterReset <= oS.counterResetDetetion_CountAfterReset) {
                     return;
                 }
 
@@ -340,6 +341,9 @@ class valuetrackerovertime extends utils.Adapter {
 
 
             }
+            oS.lastWrongValue = NaN;
+            oS.FirstWrongValue = NaN;
+
             oS.lastGoodValue = current_value;
             for (const TimeFrame in TimeFrames) {
                 await this._calcCurrentTimeFrameValue(oS, date, current_value, TimeFrame);
