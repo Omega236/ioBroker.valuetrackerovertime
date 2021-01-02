@@ -30,3 +30,27 @@ label > i[title] {
 }
 
 /* Add your styles here */
+.mytooltip {
+  border-bottom: 1px dotted black;
+}
+
+.mytooltip .mytooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: left;
+  font-size: large;
+  border-radius: 6px;
+  padding:10px;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 0%;
+  margin-left: 10px;
+}
+
+.mytooltip:hover .mytooltiptext {
+  visibility: visible;
+}
