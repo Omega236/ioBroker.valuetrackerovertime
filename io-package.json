@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "news": {
+          "0.4.1": {
+            "en": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi",
+            "de": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi"
+          },
           "0.4.0": {
             "en": "HistoryAnalyseDetailed Added, Bugfix KW",
             "de": "HistoryAnalyseDetailed Added, Bugfix KW"

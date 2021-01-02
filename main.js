@@ -624,37 +624,38 @@ class valuetrackerovertime extends utils.Adapter {
             if (TimeFrame == TimeFrames.Year) {
                 mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber.Year + "_Year_" + date.getFullYear();
                 await this._setExtendObject(oS, mydetailedObjectId, date.getFullYear() + " Value", "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-                return mydetailedObjectId;
-            }
 
-            mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
-            await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
+            }
+            else {
 
-            if (TimeFrame == TimeFrames.Day) {
-                const MonthString = date.toLocaleString("en-us", { month: "long" });
-                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
-                await this._setExtendChannel(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, true);
-                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getDate(), 2);
-                await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getDate(), 2) + ". " + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-            }
-            if (TimeFrame == TimeFrames.Month) {
-                const MonthString = date.toLocaleString("en-us", { month: "long" });
-                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
-                await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-            }
-            if (TimeFrame == TimeFrames.Week) {
-                const theKWInfo = new KWInfo(date);
-                mydetailedObjectId = "." + theKWInfo.yearOfThursday + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
+                mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
+                await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
 
-                mydetailedObjectId = mydetailedObjectId + ".KW" + valuetrackerovertime.pad(theKWInfo.weekNumber, 2);
-                await this._setExtendObject(oS, mydetailedObjectId, theKWInfo.InfoString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-            }
-            if (TimeFrame == TimeFrames.Quarter) {
-                mydetailedObjectId = mydetailedObjectId + ".quater_" + this._getQuarter(date);
-                await this._setExtendObject(oS, mydetailedObjectId, "quater_" + this._getQuarter(date), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                if (TimeFrame == TimeFrames.Day) {
+                    const MonthString = date.toLocaleString("en-us", { month: "long" });
+                    mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
+                    await this._setExtendChannel(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, true);
+                    mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getDate(), 2);
+                    await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getDate(), 2) + ". " + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                }
+                if (TimeFrame == TimeFrames.Month) {
+                    const MonthString = date.toLocaleString("en-us", { month: "long" });
+                    mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
+                    await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                }
+                if (TimeFrame == TimeFrames.Week) {
+                    const theKWInfo = new KWInfo(date);
+                    mydetailedObjectId = "." + theKWInfo.yearOfThursday + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
+
+                    mydetailedObjectId = mydetailedObjectId + ".KW" + valuetrackerovertime.pad(theKWInfo.weekNumber, 2);
+                    await this._setExtendObject(oS, mydetailedObjectId, theKWInfo.InfoString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                }
+                if (TimeFrame == TimeFrames.Quarter) {
+                    mydetailedObjectId = mydetailedObjectId + ".quater_" + this._getQuarter(date);
+                    await this._setExtendObject(oS, mydetailedObjectId, "quater_" + this._getQuarter(date), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                }
             }
             await this._setStateRoundedAsync(oS, mydetailedObjectId, TimeFrame_value, true);
-
             return mydetailedObjectId;
         }
 
@@ -798,7 +799,7 @@ class valuetrackerovertime extends utils.Adapter {
                 while (testDate.getDate() > LastHis.hisdate.getDate() || testDate.getMonth() > LastHis.hisdate.getMonth() || testDate.getFullYear() > LastHis.hisdate.getFullYear())
                 {
                     testDate.setDate(testDate.getDate() - 1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, testDate, lastGoodValue - startvalues[TimeFrames.Day]);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, testDate, (lastGoodValue - startvalues[TimeFrames.Day]) * oS.output_multiplier);
                     startvalues[TimeFrames.Day] = lastGoodValue;
                     DPfilled ++;
                 }
@@ -814,7 +815,7 @@ class valuetrackerovertime extends utils.Adapter {
                 {
                     testDate.setDate(testDate.getDate()-7);
                     testDateKWInfo = new KWInfo(testDate);
-                    await  this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, testDate, lastGoodValue - startvalues[TimeFrames.Week]);
+                    await  this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, testDate, (lastGoodValue - startvalues[TimeFrames.Week]) * oS.output_multiplier);
                     startvalues[TimeFrames.Week] = lastGoodValue;
                     DPfilled ++;
                 }
@@ -823,7 +824,7 @@ class valuetrackerovertime extends utils.Adapter {
                 while (testDate.getMonth() >  LastHis.hisdate.getMonth() ||  testDate.getFullYear()  >  LastHis.hisdate.getFullYear()  )
                 {
                     testDate.setMonth(testDate.getMonth() -1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, testDate, lastGoodValue - startvalues[TimeFrames.Month]);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, testDate, (lastGoodValue - startvalues[TimeFrames.Month]) *  oS.output_multiplier);
                     startvalues[TimeFrames.Month] = lastGoodValue;
                     DPfilled ++;
                 }
@@ -832,7 +833,7 @@ class valuetrackerovertime extends utils.Adapter {
                 while (Math.floor(testDate.getMonth() / 3) > Math.floor( LastHis.hisdate.getMonth() / 3)  || testDate.getFullYear() > LastHis.hisdate.getFullYear() )
                 {
                     testDate.setMonth(testDate.getMonth() -3);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, testDate, lastGoodValue - startvalues[TimeFrames.Quarter]);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, testDate, (lastGoodValue - startvalues[TimeFrames.Quarter]) * oS.output_multiplier );
                     startvalues[TimeFrames.Quarter] = lastGoodValue;
                     DPfilled ++;
                 }
@@ -841,7 +842,7 @@ class valuetrackerovertime extends utils.Adapter {
                 while (testDate.getFullYear() > LastHis.hisdate.getFullYear() )
                 {
                     testDate.setFullYear(testDate.getFullYear() -1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, testDate, lastGoodValue - startvalues[TimeFrames.Year]);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, testDate, (lastGoodValue - startvalues[TimeFrames.Year]) * oS.output_multiplier);
                     startvalues[TimeFrames.Year] = lastGoodValue;
                     DPfilled ++;
                 }
@@ -936,9 +937,6 @@ class KWInfo {
         // (3 - result) is necessary to get the Thursday of the current week.
         // If we want to have Tuesday it would be (1-result)
         const currentThursday = new Date(date.getTime() +(3-((date.getDay()+6) % 7)) * 86400000);
-        /**
- * @type {Date}
- */
         this.weekstart = new Date(currentThursday);
         this.weekstart.setDate(currentThursday.getDate()-3);
 
@@ -954,7 +952,7 @@ class KWInfo {
         // +1 we start with week number 1
         // +0.5 an easy and dirty way to round result (in combinationen with Math.floor)
         this.weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000/7);
-        this.InfoString =              "KW_" + this.weekNumber + " (" + valuetrackerovertime.pad(this.weekstart.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekstart.getMonth() + 1, 2) + "." + this.weekstart.getFullYear() + " - " + valuetrackerovertime.pad(this.weekends.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekends.getMonth() + 1, 2) + "." + this.weekends.getFullYear() + ")"  ;
+        this.InfoString = "KW_" + this.weekNumber + " (" + valuetrackerovertime.pad(this.weekstart.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekstart.getMonth() + 1, 2) + "." + this.weekstart.getFullYear() + " - " + valuetrackerovertime.pad(this.weekends.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekends.getMonth() + 1, 2) + "." + this.weekends.getFullYear() + ")"  ;
 
 
     }
