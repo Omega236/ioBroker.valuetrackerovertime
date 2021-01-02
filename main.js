@@ -52,7 +52,6 @@ class valuetrackerovertime extends utils.Adapter {
         this.on("stateChange", this.onStateChange.bind(this));
         this.on("objectChange", this.onObjectChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
-        this.on("message", this.onMessage.bind(this));
     }
 
 
@@ -101,7 +100,7 @@ class valuetrackerovertime extends utils.Adapter {
     async _getCurrentValue(oS) {
         const currentState = await this.getForeignStateAsync(oS.id);
         if (currentState && currentState.val && Number(currentState.val) != Number.NaN) {
-            return this._roundto(Number(currentState.val));
+            return Number(currentState.val);
         }
         return 0;
     }
@@ -170,6 +169,14 @@ class valuetrackerovertime extends utils.Adapter {
                 await this.subscribeForeignStatesAsync(oS.id);
                 oS.initialFinished = true;
                 await this._publishCurrentValue(oS, new Date(), currentval);
+
+
+                if (oS.historyload_Detailed){
+                    iobrokerObject.common.custom[this.namespace].historyload_Detailed = false;
+                    await this.setForeignObjectAsync(oS.id, iobrokerObject);
+                    await this._readDetailedFromHistory_SQL(oS, oS.historyInstanz);
+                }
+
 
                 this.log.debug("initial done " + iobrokerObject._id + " -> " + this.namespace + "." + oS.alias);
             } else {
@@ -272,15 +279,15 @@ class valuetrackerovertime extends utils.Adapter {
         for (iBeforeCount = oS.beforeCount(TimeFrame); iBeforeCount > 1; iBeforeCount--) {
             const theValBefore = await this.getStateAsync(oS.alias + await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount - 1));
             const theObjectBefore = await this.getObjectAsync(oS.alias + await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount - 1));
-            if (theValBefore && theObjectBefore) {
-                await this._setStateAsync(oS.alias + await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), Number(theValBefore.val), true);
+            if (theValBefore && theObjectBefore &&  typeof theValBefore.val === "number" ) {
+                await this._setStateRoundedAsync(oS, await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), theValBefore.val, true);
                 await this._setExtendObject(oS, await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), theObjectBefore.common.name.toString(), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
             }
         }
         if (iBeforeCount == 1) {
-            const current_timeper = this._roundto(this._roundto(oS.lastGoodValue - await this._getStartValue(oS, TimeFrame, oS.lastGoodValue)) * oS.output_multiplier);
+            const TimeFrameValue = (oS.lastGoodValue - await this._getStartValue(oS, TimeFrame, oS.lastGoodValue)) * oS.output_multiplier;
 
-            await this._setStateAsync(oS.alias + await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), current_timeper, true);
+            await this._setStateRoundedAsync(oS, await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), TimeFrameValue, true);
             await this._setExtendObject(oS, await this._getObjectIdPrevious(oS, TimeFrame, iBeforeCount), await this._getDateTimeInfoForPrevious(oS, TimeFrame, date, 1), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
 
         }
@@ -310,8 +317,6 @@ class valuetrackerovertime extends utils.Adapter {
     async _publishCurrentValue(oS, date, current_value) {
         if (oS.initialFinished) {
 
-            current_value = this._roundto(current_value);
-
             if (oS.counterResetDetection && current_value < oS.lastGoodValue) {
                 //Verringerung erkannt -> neuanpassung der startWerte
                 if (Number.isNaN(oS.FirstWrongValue)) {
@@ -326,7 +331,7 @@ class valuetrackerovertime extends utils.Adapter {
                     return;
                 }
 
-                const theAnpassung = this._roundto(oS.lastGoodValue - oS.FirstWrongValue);
+                const theAnpassung = oS.lastGoodValue - oS.FirstWrongValue;
 
 
                 this.log.warn(oS.id + " wurde scheinbar resetet! Reset von " + oS.lastGoodValue + " nach " + current_value + " passe alle Startwerte an");
@@ -361,48 +366,58 @@ class valuetrackerovertime extends utils.Adapter {
   * @param {string} TimeFrame
   */
     async _calcCurrentTimeFrameValue(oS, date, current_value, TimeFrame) {
-        const current_TimeFrame = this._roundto(this._roundto(current_value - await this._getStartValue(oS, TimeFrame, current_value)) * oS.output_multiplier);
+        const TimeFrame_value = (current_value - await this._getStartValue(oS, TimeFrame, current_value)) * oS.output_multiplier;
+        await this._saveCurrentTimeFrameValue(oS, TimeFrame_value, TimeFrame);
+        await this._saveDetailedTimeFrameValue(oS, date, TimeFrame_value, TimeFrame);
+
+    }
+
+    /**
+* Recalculate the Current and Detailed Values
+* @param {ObjectSettings} oS
+* @param {number} TimeFrame_value
+* @param {string} TimeFrame
+*/
+    async _saveCurrentTimeFrameValue(oS, TimeFrame_value, TimeFrame) {
         if (oS.beforeCount(TimeFrame) >= 0) {
-            await this._setStateAsync(oS.alias + await this._getObjectIDCurrent(TimeFrame), current_TimeFrame, true);
+            await this._setStateRoundedAsync(oS, await this._getObjectIDCurrent(TimeFrame), TimeFrame_value, true);
         }
 
-        if (oS.detailed(TimeFrame) === true) {
-            const id = oS.alias + await this._getAndCreateObjectIdDetailed(oS, TimeFrame, date);
-            const val = current_TimeFrame;
-            await this._setStateAsync(id, val, true);
-        }
+    }
+    /**
+* Recalculate the Current and Detailed Values
+* @param {ObjectSettings} oS
+* @param {Date} date
+* @param {number} TimeFrame_value
+* @param {string} TimeFrame
+*/
+    async _saveDetailedTimeFrameValue(oS, date, TimeFrame_value, TimeFrame) {
+
+        await this._CreateAndSetObjectIdDetailed(oS, TimeFrame, date, TimeFrame_value);
 
     }
 
 
-    async _setStateAsync(id, state, ack) {
-        await this.setStateAsync(id, state, ack);
+
+    /**
+* round and set the value
+* @param {ObjectSettings} oS
+* @param {string} id
+* @param {number} value
+* @param {boolean} ack
+*/
+    async _setStateRoundedAsync(oS, id, value, ack) {
+        await this.setStateAsync(oS.alias + id, this._roundto( value), ack);
 
     }
+
+
 
 
 
 
     /**
-  * returns the KW of the date
-  * @param {Date} date
-  */
-    _getKW(date) {
-    // Copy date so don"t modify original
-        const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        d.setHours(0, 0, 0, 0);
-        // Thursday in current week decides the year.
-        d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
-        // January 4 is always in week 1.
-        const week1 = new Date(d.getFullYear(), 0, 4);
-        // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-        return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000
-      - 3 + (week1.getDay() + 6) % 7) / 7);
-
-    }
-
-    /**
-  * returns the KW of the date
+  * returns the quarter of the date
   * @param {Date} date
   */
     _getQuarter(date) {
@@ -418,7 +433,7 @@ class valuetrackerovertime extends utils.Adapter {
     async _generateTreeStructure(oS) {
         await this._setExtendChannel(oS, "", "CounterData for " + oS.id, true);
         await this._setExtendObject(oS, "._counterID", "ObjectID", "", true, false, null, "string");
-        await this._setStateAsync(oS.alias + "._counterID", oS.id, true);
+        await this.setStateAsync(oS.alias + "._counterID", oS.id, true);
         await this._setExtendChannel(oS, "._startValues", "startValues for TimeFrames", true);
 
 
@@ -452,11 +467,11 @@ class valuetrackerovertime extends utils.Adapter {
     }
 
     /**
-  * Adds 0 to numbers
-  * @param {number} num
-  * @param {number} size
-  */
-    pad(num, size) {
+* Adds 0 to numbers
+* @param {number} num
+* @param {number} size
+*/
+    static pad(num, size) {
         let s = num + "";
         while (s.length < size) s = "0" + s;
         return s;
@@ -542,7 +557,7 @@ class valuetrackerovertime extends utils.Adapter {
 
 
 
-        const theID = "." + TimeFramesNumber[TimeFrame] + "_previous" + TimeFrame + "s.Before_" + this.pad(beforeCounter, 2) + "_" + TimeFrame;
+        const theID = "." + TimeFramesNumber[TimeFrame] + "_previous" + TimeFrame + "s.Before_" + valuetrackerovertime.pad(beforeCounter, 2) + "_" + TimeFrame;
         return theID;
 
     }
@@ -568,12 +583,13 @@ class valuetrackerovertime extends utils.Adapter {
             theDateInfo = Newdate.toLocaleDateString();
         } else if (TimeFrame == TimeFrames.Week) {
             Newdate.setDate(Newdate.getDate() - 7 * beforeZähler);
-            theDateInfo = "KW_" + this._getKW(Newdate);
+            const theKW = new KWInfo(Newdate);
+            theDateInfo = theKW.InfoString;
         }
         else if (TimeFrame == TimeFrames.Month) {
             Newdate.setMonth(Newdate.getMonth() - beforeZähler);
             const MonthString = Newdate.toLocaleString("en-us", { month: "long" });
-            theDateInfo = this.pad(Newdate.getMonth() + 1, 2) + "_" + MonthString;
+            theDateInfo = valuetrackerovertime.pad(Newdate.getMonth() + 1, 2) + "_" + MonthString;
         }
         else if (TimeFrame == TimeFrames.Quarter) {
             Newdate.setMonth(Newdate.getMonth() - (beforeZähler * 3));
@@ -593,46 +609,54 @@ class valuetrackerovertime extends utils.Adapter {
 
 
     /**
-  * Creates the needed TreeStructure and returns the Id after alias-name
-  * @param {ObjectSettings} oS
-  * @param {string} TimeFrame
-  * @param {Date} date
-  */
-    async _getAndCreateObjectIdDetailed(oS, TimeFrame, date) {
+* Creates the needed TreeStructure and returns the Id after alias-name
+* @param {ObjectSettings} oS
+* @param {string} TimeFrame
+* @param {Date} date
+* @param {number} TimeFrame_value
+*/
+    async _CreateAndSetObjectIdDetailed(oS, TimeFrame, date, TimeFrame_value) {
+        if (oS.detailed(TimeFrame)){
 
-        let IZusatz = "." + date.getFullYear();
-        await this._setExtendChannel(oS, IZusatz, String(date.getFullYear()), true);
+            let mydetailedObjectId = "." + date.getFullYear();
+            await this._setExtendChannel(oS, mydetailedObjectId, String(date.getFullYear()), true);
 
-        if (TimeFrame == TimeFrames.Year) {
-            IZusatz = IZusatz + "." + TimeFramesNumber.Year + "_Year_" + date.getFullYear();
-            await this._setExtendObject(oS, IZusatz, date.getFullYear() + " Value", "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-            return IZusatz;
-        }
+            if (TimeFrame == TimeFrames.Year) {
+                mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber.Year + "_Year_" + date.getFullYear();
+                await this._setExtendObject(oS, mydetailedObjectId, date.getFullYear() + " Value", "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+                return mydetailedObjectId;
+            }
 
-        IZusatz = IZusatz + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
-        await this._setExtendChannel(oS, IZusatz, TimeFrame + "s", true);
+            mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
+            await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
 
-        if (TimeFrame == TimeFrames.Day) {
-            const MonthString = date.toLocaleString("en-us", { month: "long" });
-            IZusatz = IZusatz + "." + this.pad(date.getMonth() + 1, 2) + "_" + MonthString;
-            await this._setExtendChannel(oS, IZusatz, this.pad(date.getMonth() + 1, 2) + "_" + MonthString, true);
-            IZusatz = IZusatz + "." + this.pad(date.getDate(), 2);
-            await this._setExtendObject(oS, IZusatz, this.pad(date.getDate(), 2) + ". " + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+            if (TimeFrame == TimeFrames.Day) {
+                const MonthString = date.toLocaleString("en-us", { month: "long" });
+                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
+                await this._setExtendChannel(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, true);
+                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getDate(), 2);
+                await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getDate(), 2) + ". " + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+            }
+            if (TimeFrame == TimeFrames.Month) {
+                const MonthString = date.toLocaleString("en-us", { month: "long" });
+                mydetailedObjectId = mydetailedObjectId + "." + valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString;
+                await this._setExtendObject(oS, mydetailedObjectId, valuetrackerovertime.pad(date.getMonth() + 1, 2) + "_" + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+            }
+            if (TimeFrame == TimeFrames.Week) {
+                const theKWInfo = new KWInfo(date);
+                mydetailedObjectId = "." + theKWInfo.yearOfThursday + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
+
+                mydetailedObjectId = mydetailedObjectId + ".KW" + valuetrackerovertime.pad(theKWInfo.weekNumber, 2);
+                await this._setExtendObject(oS, mydetailedObjectId, theKWInfo.InfoString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+            }
+            if (TimeFrame == TimeFrames.Quarter) {
+                mydetailedObjectId = mydetailedObjectId + ".quater_" + this._getQuarter(date);
+                await this._setExtendObject(oS, mydetailedObjectId, "quater_" + this._getQuarter(date), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
+            }
+            await this._setStateRoundedAsync(oS, mydetailedObjectId, TimeFrame_value, true);
+
+            return mydetailedObjectId;
         }
-        if (TimeFrame == TimeFrames.Month) {
-            const MonthString = date.toLocaleString("en-us", { month: "long" });
-            IZusatz = IZusatz + "." + this.pad(date.getMonth() + 1, 2) + "_" + MonthString;
-            await this._setExtendObject(oS, IZusatz, this.pad(date.getMonth() + 1, 2) + "_" + MonthString, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-        }
-        if (TimeFrame == TimeFrames.Week) {
-            IZusatz = IZusatz + ".KW" + this.pad(this._getKW(date), 2);
-            await this._setExtendObject(oS, IZusatz, "KW" + this.pad(this._getKW(date), 2), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-        }
-        if (TimeFrame == TimeFrames.Quarter) {
-            IZusatz = IZusatz + ".quater_" + this._getQuarter(date);
-            await this._setExtendObject(oS, IZusatz, "quater_" + this._getQuarter(date), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
-        }
-        return IZusatz;
 
     }
 
@@ -649,13 +673,13 @@ class valuetrackerovertime extends utils.Adapter {
 
 
     /**
-  * extends the Object with customData in the correct namespace
-  * @param {ObjectSettings} oS
-  * @param {string} TimeFrame
-  * @param {object} value
-  */
+* extends the Object with customData in the correct namespace
+* @param {ObjectSettings} oS
+* @param {string} TimeFrame
+* @param {number} value
+*/
     async _setStartValue(oS, TimeFrame, value) {
-        await this._setStateAsync(oS.alias + await this._getStartID(TimeFrame), this._roundto(value), true);
+        await this._setStateRoundedAsync(oS, await this._getStartID(TimeFrame), value, true);
     }
     /**
   * Returns the startid
@@ -679,7 +703,7 @@ class valuetrackerovertime extends utils.Adapter {
         //set startData if not set
         const state = await this.getStateAsync(oS.alias + startID);
         if (!state || state.val == null || state.val == undefined) {
-            await this._setStateAsync(oS.alias + startID, currentValue, true);
+            await this._setStateRoundedAsync(oS, startID, currentValue, true);
             return currentValue;
         }
         else {
@@ -688,24 +712,254 @@ class valuetrackerovertime extends utils.Adapter {
     }
 
 
-    /**
-  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-  * Using this method requires "common.message" property to be set to true in io-package.json
-  * @param {ioBroker.Message} obj
-  */
-    onMessage(obj) {
-        if (typeof obj === "object" && obj.message) {
-            if (obj.command === "send") {
-                // e.g. send email or pushover or whatever
-                this.log.info("send command");
 
-                // Send response in callback if required
-                if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
+
+
+
+
+    /**
+    * extends the Object with customData in the correct namespace
+    * @param {ObjectSettings} oS
+    * @param {string} historyInstanz
+    */
+    async _readDetailedFromHistory_SQL(oS, historyInstanz) {
+        //First get all Data in Ascending ts
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Frage von " + historyInstanz + " die Daten der letzten 10 jahre ab (Wenn keine weiteren Logs, dann exisiter vielleicht die Instanz nicht oder ist deaktiviert)");
+
+        const end = Date.now();
+        const start = end - 10*365*24* 3600000 ;
+
+
+
+        const gethistory = await this.sendToAsync(historyInstanz, "getHistory", {
+            id: oS.id,
+            options: {
+                end: end,
+                start:      start,
+                count: 100000000,
+                aggregate: "none" // or 'none' to get raw values
+            }
+        });
+
+        if (gethistory) {
+            if  (gethistory["error"]) {
+                this.log.error("HistoryAnalyseDetailed " + oS.id + ": Fehler bei Datenlesen: " + gethistory["error"]);
+            }
+            else if ( gethistory["result"]){
+                this.log.info("HistoryAnalyseDetailed " + oS.id + ": wandle SQL Datensätze um: " + gethistory["result"].length);
+                const allData = [];
+                for (const one in gethistory["result"])
+                {
+                    allData.push(new historyData(gethistory["result"][one].ts, gethistory["result"][one].val));
+                }
+                await this._readDetailedFromHisory(oS, allData);
+
             }
         }
+        else {
+            this.log.warn("no Response from Instance (active and exists?)");
+        }
+
+
+
     }
+    /**
+    * @param {ObjectSettings} oS
+    * @param {Array<historyData>} HistoryDataList
+    */
+    async _readDetailedFromHisory(oS, HistoryDataList) {
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Verarbeite " + HistoryDataList.length + " History Datensätze ");
+
+        let DPfilled = 0;
+        let resetsDetected = 0;
+        const startvalues = {};
+        let lastGoodValue = 0;
+        let FirstWrongValue = NaN;
+        let counterResetDetetion_CurrentCountAfterReset = 0;
+        let lastWrongValue = NaN;
+
+
+        let LastHis;
+        for (const zahler in HistoryDataList)
+        {
+            const myHis = HistoryDataList[zahler];
+            if (!LastHis){
+
+                lastGoodValue= myHis.hisval;
+                for (const TimeFrame in TimeFrames){
+                    startvalues[TimeFrame] = myHis.hisval;
+
+
+                }
+            }
+            else{
+                //TimeframeChange erkennen
+                let testDate = new Date( myHis.hisdate);
+                while (testDate.getDate() > LastHis.hisdate.getDate() || testDate.getMonth() > LastHis.hisdate.getMonth() || testDate.getFullYear() > LastHis.hisdate.getFullYear())
+                {
+                    testDate.setDate(testDate.getDate() - 1);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, testDate, lastGoodValue - startvalues[TimeFrames.Day]);
+                    startvalues[TimeFrames.Day] = lastGoodValue;
+                    DPfilled ++;
+                }
+
+
+
+                testDate = new Date( myHis.hisdate);
+
+                let testDateKWInfo = new KWInfo(testDate);
+                const LastHisKWInfo = new KWInfo(LastHis.hisdate);
+
+                while ( testDateKWInfo.weekNumber > LastHisKWInfo.weekNumber || testDateKWInfo.yearOfThursday > LastHisKWInfo.yearOfThursday)
+                {
+                    testDate.setDate(testDate.getDate()-7);
+                    testDateKWInfo = new KWInfo(testDate);
+                    await  this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, testDate, lastGoodValue - startvalues[TimeFrames.Week]);
+                    startvalues[TimeFrames.Week] = lastGoodValue;
+                    DPfilled ++;
+                }
+
+                testDate = new Date( myHis.hisdate);
+                while (testDate.getMonth() >  LastHis.hisdate.getMonth() ||  testDate.getFullYear()  >  LastHis.hisdate.getFullYear()  )
+                {
+                    testDate.setMonth(testDate.getMonth() -1);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, testDate, lastGoodValue - startvalues[TimeFrames.Month]);
+                    startvalues[TimeFrames.Month] = lastGoodValue;
+                    DPfilled ++;
+                }
+
+                testDate = new Date( myHis.hisdate);
+                while (Math.floor(testDate.getMonth() / 3) > Math.floor( LastHis.hisdate.getMonth() / 3)  || testDate.getFullYear() > LastHis.hisdate.getFullYear() )
+                {
+                    testDate.setMonth(testDate.getMonth() -3);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, testDate, lastGoodValue - startvalues[TimeFrames.Quarter]);
+                    startvalues[TimeFrames.Quarter] = lastGoodValue;
+                    DPfilled ++;
+                }
+
+                testDate = new Date( myHis.hisdate);
+                while (testDate.getFullYear() > LastHis.hisdate.getFullYear() )
+                {
+                    testDate.setFullYear(testDate.getFullYear() -1);
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, testDate, lastGoodValue - startvalues[TimeFrames.Year]);
+                    startvalues[TimeFrames.Year] = lastGoodValue;
+                    DPfilled ++;
+                }
+
+
+                //Reset detection
+                if (oS.counterResetDetection && myHis.hisval < lastGoodValue) {
+                    //Verringerung erkannt -> neuanpassung der startWerte
+                    if (Number.isNaN(FirstWrongValue)) {
+                        FirstWrongValue = myHis.hisval;
+                        counterResetDetetion_CurrentCountAfterReset = 0;
+                        lastWrongValue = NaN;
+                    }
+                    if (lastWrongValue != myHis.hisval) {
+                        counterResetDetetion_CurrentCountAfterReset += 1;
+                        lastWrongValue = myHis.hisval;
+                    }
+                    if (counterResetDetetion_CurrentCountAfterReset <= oS.counterResetDetetion_CountAfterReset) {
+                        //return;
+                    }
+                    else{
+                        const theAnpassung = lastGoodValue - FirstWrongValue;
+
+
+                        this.log.warn("HistoryAnalyseDetailed " + oS.id + ": Counter wurde scheinbar resetet! Reset von " + lastGoodValue + " nach " + myHis.hisval + " passe alle Startwerte an");
+                        lastGoodValue = myHis.hisval;
+                        FirstWrongValue = NaN;
+                        resetsDetected ++;
+                        for (const TimeFrame in TimeFrames) {
+                            startvalues[TimeFrame] =  startvalues[TimeFrame] - theAnpassung;
+                        }
+
+                    }
+
+
+
+                }
+                else {
+                    FirstWrongValue = NaN;
+                    lastGoodValue = myHis.hisval;
+
+                }
+
+            }
+
+            LastHis = myHis;
+
+        }
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + DPfilled + " Resets detected: " + resetsDetected);
+    }
+
+}
+class historyData {
+
+    /**
+  * Generate new ObjectSettingsClass
+  * @param {Date} hisdate
+  * @param {number } hisval
+  */
+    constructor(hisdate, hisval) {
+        if (typeof hisdate === "number")
+        {
+            if (Number(hisdate) > 10000){
+                hisdate = new Date(hisdate);
+            }
+        }
+        this.hisval = hisval;
+        this.hisdate = hisdate;
+    }
+
 }
 
+class KWInfo {
+
+    /**
+* Generate new ObjectSettingsClass
+* @param {Date} date
+*/
+    constructor(date) {
+        // Get Date Objekt from 2021.12.24
+        this.date = date;
+
+        // In JavaScript the Sunday has value 0 as return value of getDay() function.
+        // So we have to order them first ascending from Monday to Sunday
+        // Monday: ((1+6) % 7) = 0
+        // Tuesday ((2+6) % 7) = 1
+        // Wednesday: ((3+6) % 7) = 2
+        // Thursday: ((4+6) % 7) = 3
+        // Friday: ((5+6) % 7) = 4
+        // Saturday: ((6+6) % 7) = 5
+        // Sunday: ((0+6) % 7) = 6
+        // (3 - result) is necessary to get the Thursday of the current week.
+        // If we want to have Tuesday it would be (1-result)
+        const currentThursday = new Date(date.getTime() +(3-((date.getDay()+6) % 7)) * 86400000);
+        /**
+ * @type {Date}
+ */
+        this.weekstart = new Date(currentThursday);
+        this.weekstart.setDate(currentThursday.getDate()-3);
+
+        this.weekends = new Date(currentThursday);
+        this.weekends.setDate(currentThursday.getDate()+3);
+
+        // At the beginnig or end of a year the thursday could be in another year.
+        this.yearOfThursday = currentThursday.getFullYear();
+
+        // Get first Thursday of the year
+        const firstThursday = new Date(new Date(this.yearOfThursday,0,4).getTime() +(3-((new Date(this.yearOfThursday,0,4).getDay()+6) % 7)) * 86400000);
+
+        // +1 we start with week number 1
+        // +0.5 an easy and dirty way to round result (in combinationen with Math.floor)
+        this.weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000/7);
+        this.InfoString =              "KW_" + this.weekNumber + " (" + valuetrackerovertime.pad(this.weekstart.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekstart.getMonth() + 1, 2) + "." + this.weekstart.getFullYear() + " - " + valuetrackerovertime.pad(this.weekends.getDate(), 2) + "." + valuetrackerovertime.pad(this.weekends.getMonth() + 1, 2) + "." + this.weekends.getFullYear() + ")"  ;
+
+
+    }
+
+}
 
 // @ts-ignore parent is a valid property on module
 if (module.parent) {

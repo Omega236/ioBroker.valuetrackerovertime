@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.3.5",
+        "version": "0.4.0",
         "news": {
+          "0.4.0": {
+            "en": "HistoryAnalyseDetailed Added, Bugfix KW",
+            "de": "HistoryAnalyseDetailed Added, Bugfix KW"
+          },
           "0.3.5": {
             "en": "reset Detection optimize and bugfix only ack",
             "de": "reset Detection optimize and bugfix only ack"
@@ -106,8 +110,9 @@
     "before_quarters": 4,
     "before_years": 3,
     "counterResetDetection": true,
-    "counterResetDetetion_CountAfterReset":1
-  },
+    "counterResetDetetion_CountAfterReset":1,
+    "historyInstanz": "sql.0"
+    },
   "objects": [],
   "instanceObjects": []
 }

@@ -41,6 +41,11 @@ class ObjectSettings {
         return String(ret);
     }
 
+    get historyload_Detailed() {  return Boolean(this.myCustomSettings.historyload_Detailed); }
+    get historyInstanz() { return String( this.myCustomSettings.historyInstanz);}
+
+
+
     get id() { return this.iobrokerObject._id; }
 
     get counterResetDetetion_CountAfterReset() { return Number(this.myCustomSettings.counterResetDetetion_CountAfterReset); }
