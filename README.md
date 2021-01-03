@@ -19,7 +19,7 @@ Tracks all numbers and their increase/decrease. The data then will be used to bu
 Settings for the ValueTrackerOverTime will be done in two places. The default settings will be handled in the instance of the adapter itself, the settings for the individual datapoints will be done in the datapoints containing the data to be tracked.
 
 ### Default settings
-[!Image](admin/DefaultSettings.png)
+(admin/DefaultSettings.png)
 
 
 
