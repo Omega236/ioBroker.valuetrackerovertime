@@ -38,6 +38,20 @@ It makes sense to stop collecting the data once it ends up within another datapo
 This value should always beenabled and set to one. It helps the ValueTrackerOverTime to make correct readings after a value in the original datapoint is being resettet.
 
 ### Datapoint settings
+![plot](admin/DatapointSettings.png)
+In this setting you have to give a nema which will be used as the datapoint name for this selecion node. Additionally you have to give the unit you want the data to be collected in.
+So if you want to measure the amount of rain, you can add the unit l/m² or you want to measure the amount of consumed enery as Watt hours (kWh).
+In case the datapoint itself uses a different unit (i.E. Wh) you can add a multiplier here (i.e. 60 or 1/60) to converse the data into the required unit.
+
+The rest of the settings will overwrite the default settings which have been set in the adapter instance.
+
+## Datapoints
+Depending on the selected timeframes to be collected, the adapter will create for each datapoint you want to track, its own datapoints.
+
+In the picture there are three examples given. Since the screenshot was taken on January 3rd (beginning of new Year/Month), please excuse that the data is not that colorful and divers.
+* You can see that today it was a Rain Counter (Regenmenge) of 0.3 l/m² which did not change the entire week.
+* The sun did not shine at all during this winters week (for my weahter station it means that it did not get any grighter than 4,500lm any day)
+* The energy consumtion however will show you that the current day for the computer is set to 0.351kWh, the week is set to 1.909 kWh and the year is set to 1.393 kWh (which is because today is Sunday and the week is already 7 days old, but it is also the 3rd of January which makes the year only three days old).
 
 ## Changelog
 
