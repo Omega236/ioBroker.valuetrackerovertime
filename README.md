@@ -19,8 +19,15 @@ Tracks all numbers and their increase/decrease. The data then will be used to bu
 Settings for the ValueTrackerOverTime will be done in two places. The default settings will be handled in the instance of the adapter itself, the settings for the individual datapoints will be done in the datapoints containing the data to be tracked.
 
 ### Default settings
-(admin/DefaultSettings.png)
+![plot](admin/DefaultSettings.png)
+These are the default settings which will be prompted whenever you activate ValueTrackerOverTime on a datapoint. For each datapoint those can be customed, but the initial values most commoly used) are set here as default values so later you don't have to make to many modifications.
 
+In the secion "Detailed History", the datapoints to be created will be selected. Will you want to collect the data for every
+* day
+* week
+* month
+* quarter (of a year)
+* Year
 
 
 
