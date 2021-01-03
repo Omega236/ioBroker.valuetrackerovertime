@@ -22,6 +22,7 @@ Settings for the ValueTrackerOverTime will be done in two places. The default se
 ![plot](admin/DefaultSettings.png)
 These are the default settings which will be prompted whenever you activate ValueTrackerOverTime on a datapoint. For each datapoint those can be customed, but the initial values most commoly used) are set here as default values so later you don't have to make to many modifications.
 
+#### Detailed history
 In the secion "Detailed History", the datapoints to be created will be selected. Will you want to collect the data for every
 * day
 * week
@@ -29,7 +30,12 @@ In the secion "Detailed History", the datapoints to be created will be selected.
 * quarter (of a year)
 * Year
 
+#### Current / previous data
+In the section "Current / previous data" you are able to select how long you want to keep the collected data for every ValueTrackerOverTime-datapoint which is generated for each timeframe.
+It makes sense to stop collecting the data once it ends up within another datapoint (for example: After 7 days, the data can be found  cummulated in a week. After 4 weeks the data will find itself in a month...)
 
+#### Counter Reset Detection
+This value should always beenabled and set to one. It helps the ValueTrackerOverTime to make correct readings after a value in the original datapoint is being resettet.
 
 ### Datapoint settings
 
