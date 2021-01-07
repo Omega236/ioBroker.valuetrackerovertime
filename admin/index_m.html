@@ -2,251 +2,98 @@
 
 <head>
 
-  <!-- Load ioBroker scripts and styles-->
-  <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
-  <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
 
-  <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+    <!-- Load ioBroker scripts and styles-->
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
 
-  <script type="text/javascript" src="../../js/translate.js"></script>
-  <script type="text/javascript" src="../../lib/js/materialize.js"></script>
-  <script type="text/javascript" src="../../js/adapter-settings.js"></script>
-  <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
-  <script type="text/javascript" src="../../lib/js/jquery.fancytree-all.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css"/>
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+    <script type="text/javascript" src="../../lib/js/jquery.fancytree-all.min.js"></script>
+    <script>
+        $(function () {
+            $("#Platzhalter").load("custom_m_h.html");
+        });
+    </script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
-  <!-- Load our own files -->
-  <link rel="stylesheet" type="text/css" href="style.css" />
-  <script type="text/javascript" src="words.js"></script>
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-  <script type="text/javascript">
-    // This will be called by the admin adapter when the settings page loads
-    function load(settings, onChange) {
-      // example: select elements with id=key and class=value and insert value
-      if (!settings) return;
-      $('.value').each(function () {
-        var $key = $(this);
-        var id = $key.attr('id');
-        if ($key.attr('type') === 'checkbox') {
-          // do not call onChange direct, because onChange could expect some arguments
-          $key.prop('checked', settings[id])
-            .on('change', () => onChange())
-            ;
-        } else {
-          // do not call onChange direct, because onChange could expect some arguments
-          $key.val(settings[id])
-            .on('change', () => onChange())
-            .on('keyup', () => onChange())
-            ;
+    <link rel="stylesheet" type="text/css" href="../../lib/css/fancytree/ui.fancytree.min.css" />
+
+    <!-- Load our own files -->
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="words.js"></script>
+
+    <script type="text/javascript">
+        // This will be called by the admin adapter when the settings page loads
+        function load(settings, onChange) {
+            // example: select elements with id=key and class=value and insert value
+            if (!settings) return;
+            $('.value').each(function () {
+                var $key = $(this);
+                var id = $key.attr('id');
+                if ($key.attr('type') === 'checkbox') {
+                    // do not call onChange direct, because onChange could expect some arguments
+                    $key.prop('checked', settings[id])
+                        .on('change', () => onChange())
+                        ;
+                } else {
+                    // do not call onChange direct, because onChange could expect some arguments
+                    $key.val(settings[id])
+                        .on('change', () => onChange())
+                        .on('keyup', () => onChange())
+                        ;
+                }
+            });
+
+
+
+
+
+            onChange(false);
+            // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
+            if (M) M.updateTextFields();
         }
-      });
 
-
-      
-
-
-      onChange(false);
-      // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
-      if (M) M.updateTextFields();
-    }
-
-    // This will be called by the admin adapter when the user presses the save button
-    function save(callback) {
-      // example: select elements with class=value and build settings object
-      var obj = {};
-      $('.value').each(function () {
-        var $this = $(this);
-        if ($this.attr('type') === 'checkbox') {
-          obj[$this.attr('id')] = $this.prop('checked');
-        } else {
-          obj[$this.attr('id')] = $this.val();
+        // This will be called by the admin adapter when the user presses the save button
+        function save(callback) {
+            // example: select elements with class=value and build settings object
+            var obj = {};
+            $('.value').each(function () {
+                var $this = $(this);
+                if ($this.attr('type') === 'checkbox') {
+                    obj[$this.attr('id')] = $this.prop('checked');
+                } else {
+                    obj[$this.attr('id')] = $this.val();
+                }
+            });
+            callback(obj);
         }
-      });
-      callback(obj);
-    }
 
-    
-  </script>
+
+    </script>
 
 </head>
 
 <body>
 
-  <div class="m adapter-container">
+    <div class="m adapter-container">
 
-    <div class="row">
-      <div class="col s12 m4 l2">
-        <img src="valuetrackerovertime.png" class="logo">
-      </div>
+        <div class="row">
+            <div class="col s12 m4 l2">
+                <img src="valuetrackerovertime.png" class="logo">
+            </div>
+        </div>
+
+        <!-- Put your content here -->
+
+
+        <h5 class="sub-title">Default Settings for new Datapoints</h5>
+        <div id="Platzhalter"></div>
     </div>
-
-    <!-- Put your content here -->
-
-
-    <h5 class="sub-title">Default Settings for new Datapoints</h5>
-
-    <p class=" translate title">Detailed History</p>
-    <div class="row">
-      <span class="translate">Create for every Timeframe a extra ObjectId in Tree</span>
-  
-    </div>
-
-    <div class="row">
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_days" />
-        <label for="detailed_days" class="translate">Every Day (Many Datapoints)</label>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_DetailedDays.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_weeks" />
-        <span class="translate">Every week</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_DetailedWeeks.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_months" />
-        <span class="translate">Every month</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_DetailedMonths.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_quarters" />
-        <span class="translate">Every quarter</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_DetailedQuarters.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_years" />
-        <span class="translate">Every year</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_DetailedYears.PNG" />
-        </span>
-      </div>
-
-    </div>
-    <p class=" translate title">Detailed Current</p>
-    <div class="row">
-      <span class="translate">Overrides Data after one Year </span>
-  
-    </div>
-
-    <div class="row">
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_current_days" />
-        <label for="detailed_days" class="translate">Datapoints Mo, Tu, We, Th, Fr, Sa, Su</label>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_detailed_current_days.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_current_weeks" />
-        <span class="translate">the las KWs</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_detailed_current_weeks.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_current_months" />
-        <span class="translate">Datapoints Jan-Dec</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_detailed_current_months.PNG" />
-        </span>
-      </div>
-      <div class="col  input-field mytooltip">
-        <input type="checkbox" class="value" id="detailed_current_quarters" />
-        <span class="translate">Every quarter</span>
-        <span class = "mytooltiptext">
-          <span>example: </span>
-          <img  src="VTOT_Setting_detailed_current_quarters.PNG" />
-        </span>
-      </div>
-    </div>
-
-    <p class=" translate title">Current / previous Data    </p>
-    <div class="row">
-      <div class="col mytooltip">
-        <span class="translate">-1 = no Data collected (also no current), 0 = only current timeframe, > 0 the timeframes before </span>
-        <span class = "mytooltiptext">
-          <span>example  before >= 0: </span>
-          <img  src="VTOT_Setting_Current.PNG" />
-          <span>example  before >= 1: </span>
-          <img  src="VTOT_Setting_Before.png" />
-        </span>
-       </div>
-    </div>
-    <div class="row">
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_minutes" />
-        <span class="translate">Keep previous Minutes</span>
-      </div>
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_hours" />
-        <span class="translate">Keep previous Hours</span>
-      </div>
-
-    </div>
-    <div class="row">
-
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_days" />
-        <span class="translate">Keep previous Day</span>
-      </div>
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_weeks" />
-        <span class="translate">Keep previous week</span>
-      </div>
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_months" />
-        <span class="translate">Keep previous month</span>
-      </div>
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_quarters" />
-        <span class="translate">Keep previous quarters</span>
-      </div>
-      <div class="col s2 input-field">
-        <input type="number" class="value" id="before_years" />
-        <span class="translate">Keep previous year</span>
-      </div>
-
-    </div>
-    <p class=" translate title">Counter Reset Detection</p>
-    <div class="row">
-      <div class="col s3 input-field">
-        <input type="checkbox" class="value" id="counterResetDetection" />
-        <span class="translate">Enable Counter Reset Detection</span>
-      </div>
-      <div class="col s3 input-field">
-        <input type="number" class="value" id="counterResetDetetion_CountAfterReset" />
-        <span class="translate">Ignore Values Lower then the Last Good Value</span>
-      </div>
-
-    </div>
-    <p class=" translate title">default HistoryInstanz (Experimental)</p>
-    <div class="row">
-      <div class="col s3 input-field">
-        <input type="text" class="value" id="historyInstanz" />
-        <span class="translate">Use the data from this History Instanz, this Adapters should work: sql.x or influxdb.x or history.x</span>
-      </div>
-    </div>
-
-
-
-  </div>
-
 </body>
 
 </html>
