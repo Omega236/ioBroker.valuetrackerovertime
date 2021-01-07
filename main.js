@@ -50,10 +50,22 @@ class valuetrackerovertime extends utils.Adapter {
             name: "valuetrackerovertime",
         });
         this.dicDatas = {};
+        this.myObjects = {};
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
         this.on("objectChange", this.onObjectChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
+        this.writeTrimeFrameInfo = true
+        this.locale = "en-US"
+
+    }
+
+    async _getObjectAsync(ObjectID) {
+
+        if (!(ObjectID in this.myObjects)) {
+            this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID)
+        }
+        return this.myObjects[ObjectID];
     }
 
 
@@ -64,7 +76,7 @@ class valuetrackerovertime extends utils.Adapter {
     async onReady() {
 
 
-        this.subscribeForeignObjects("*");
+        await this.subscribeForeignObjectsAsync("*");
         await this.initialObjects();
 
         cron.schedule("* * * * *", async () => {
@@ -96,7 +108,10 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {ioBroker.Object | null | undefined} obj
      */
     async onObjectChange(id, obj) {
-        this._initialObject(obj);
+        if (id.startsWith(this.namespace)) {
+            this.myObjects[id.substring(0, this.namespace.length + 1)] = obj;
+        }
+        await this._initialObject(obj);
     }
 
     /**
@@ -116,10 +131,13 @@ class valuetrackerovertime extends utils.Adapter {
                     /**@type {ObjectSettings} */
                     const oS = this.dicDatas[oneoSID];
                     if (oS.alias == idsplit[2]) {
-                        this.log.warn(id + " changed, recalc Timeframe, old-Value: " + this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
-                        await this._calcCurrentTimeFrameValue(oS, new Date(), TimeFrame);
-                        //mark ack
-                        await this.setStateAsync(id, await this._getNumberfromState(state), true);
+
+                        this.log.warn(id + " changed, recalc Timeframe, old-Value: " + await this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
+                        await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state))
+
+
+
+
                     }
                 }
 
@@ -150,10 +168,9 @@ class valuetrackerovertime extends utils.Adapter {
             /** @type {ObjectSettings} */
             const oS = this.dicDatas[oneOD];
             this.log.debug(oS.alias + " TimeFrame " + TimeFrame + " end, insert now previous values ");
-            await this._pushNewPreviousSates(oS, TimeFrame,  (oS.lastGoodValue - await this._getStartValue(oS, TimeFrame)), await this._getDateTimeInfoForPrevious(TimeFrame, date, 1));
+            await this._pushNewPreviousSates(oS, TimeFrame, (oS.lastGoodValue - await this._getStartValue(oS, TimeFrame)), await this._getDateTimeInfoForPrevious(TimeFrame, date, 1));
             this.log.debug(oS.alias + " set startValue from TimeFrame " + TimeFrame + " to " + oS.lastGoodValue);
             await this._setStartValue(oS, TimeFrame, oS.lastGoodValue);
-            await this._calcCurrentTimeFrameValue(oS, date, TimeFrame);
         }
     }
 
@@ -179,8 +196,17 @@ class valuetrackerovertime extends utils.Adapter {
 
         // read out all Objects
         const objects = await this.getForeignObjectsAsync("", "state", null);
-        for (const idobject in objects) {
-            await this._initialObject(objects[idobject]);
+
+
+        for (const id in objects) {
+            if (id.startsWith(this.namespace)) {
+                this.myObjects[id.substring(0, this.namespace.length + 1)] = objects[id];
+            }
+
+        }
+        for (const id in objects) {
+            await this._initialObject(objects[id]);
+
         }
         this.log.info("initial completed");
     }
@@ -200,7 +226,7 @@ class valuetrackerovertime extends utils.Adapter {
             }
 
             // only do something when enabled
-            if (iobrokerObject && iobrokerObject.common.custom && iobrokerObject.common.custom[this.namespace] && iobrokerObject.common.custom[this.namespace].enabled) {
+            if (iobrokerObject && iobrokerObject.common && iobrokerObject.common.custom && iobrokerObject.common.custom[this.namespace] && iobrokerObject.common.custom[this.namespace].enabled) {
                 this.log.info("initial (enabled): " + iobrokerObject._id);
                 const oS = new ObjectSettings(iobrokerObject, this.namespace);
 
@@ -218,7 +244,7 @@ class valuetrackerovertime extends utils.Adapter {
                 //Do Subcribe and Create Objects
                 await this._generateTreeStructure(oS);
                 this.log.debug("subscribeForeignStates " + oS.id);
-                this.subscribeStates(oS.alias + "._startValues.*");
+                await this.subscribeStatesAsync(oS.alias + "._startValues.*");
                 await this.subscribeForeignStatesAsync(oS.id);
 
 
@@ -255,13 +281,13 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {Number} TimeFrameValue
      * @param {string} DateTimeInfo
      */
-    async _pushNewPreviousSates(oS, TimeFrame,  TimeFrameValue, DateTimeInfo) {
+    async _pushNewPreviousSates(oS, TimeFrame, TimeFrameValue, DateTimeInfo) {
         //Days before befüllen
         let iBeforeCount;
         //Die PreviousValues jeweils ein nach hinten schieben (von hinten anfangen um keine Daten zu verlieren)
         for (iBeforeCount = oS.beforeCount(TimeFrame); iBeforeCount > 1; iBeforeCount--) {
             const theValBefore = await this.getStateAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBeforeCount - 1));
-            const theObjectBefore = await this.getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBeforeCount - 1));
+            const theObjectBefore = await this._getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBeforeCount - 1));
             if (theValBefore && theObjectBefore && typeof theValBefore.val === "number") {
                 await this._setStateRoundedAsync(oS, await this._GetObjectIdPrevious(oS, TimeFrame, iBeforeCount), theValBefore.val, false);
                 await this._setExtendObject(oS, await this._GetObjectIdPrevious(oS, TimeFrame, iBeforeCount), theObjectBefore.common.name.toString(), "value.history." + TimeFrame, true, false, oS.output_unit, "number");
@@ -306,6 +332,7 @@ class valuetrackerovertime extends utils.Adapter {
             //Ein Counter-Reset wurde erkannt, passe Startwerte an
             this.log.warn(oS.id + " wurde scheinbar resetet! Reset von " + oS.lastGoodValue + " nach " + current_value + " passe alle Startwerte an");
             const theAnpassung = oS.lastGoodValue - oS.FirstWrongValue;
+            oS.lastGoodValue = current_value;
 
             for (const TimeFrame in TimeFrames) {
                 await this._setStartValue(oS, TimeFrame, (await this._getStartValue(oS, TimeFrame) - theAnpassung));
@@ -346,13 +373,14 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {boolean} outputMultiplie
      */
     async _setStateRoundedAsync(oS, id, value, outputMultiplie) {
-        if (outputMultiplie) {
-            value *= oS.output_multiplier;
-        }
-        if (value)
+        if (value) {
+
+            if (outputMultiplie) {
+                value *= oS.output_multiplier;
+            }
             value = Number((value).toFixed(10));
-        else
-            value = 0;
+
+        }
         await this.setStateAsync(oS.alias + id, value, true);
 
     }
@@ -390,7 +418,7 @@ class valuetrackerovertime extends utils.Adapter {
             let iBefore = 1;
             for (iBefore = 1; iBefore <= oS.beforeCount(TimeFrame); iBefore++) {
                 const thePreviousID = await this._GetObjectIdPrevious(oS, TimeFrame, iBefore);
-                const oldObject = await this.getObjectAsync(oS.alias + thePreviousID);
+                const oldObject = await this._getObjectAsync(oS.alias + thePreviousID);
                 let touseName = "no data yet";
                 if (oldObject) {
                     touseName = oldObject.common.name.toString();
@@ -398,11 +426,11 @@ class valuetrackerovertime extends utils.Adapter {
                 await this._setExtendObject(oS, await this._GetObjectIdPrevious(oS, TimeFrame, iBefore), touseName, "value.history." + TimeFrame, true, false, oS.output_unit, "number");
             }
             //Before Objecte die existieren aber nicht mehr aktiv sind auf diabled stellen
-            let theObject = await this.getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBefore));
+            let theObject = await this._getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBefore));
             while (theObject != null) {
                 await this._setExtendObject(oS, await this._GetObjectIdPrevious(oS, TimeFrame, iBefore), theObject.common.name.toString(), "value.history.disabled", false, false, oS.output_unit, "number");
                 iBefore++;
-                theObject = await this.getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBefore));
+                theObject = await this._getObjectAsync(oS.alias + await this._GetObjectIdPrevious(oS, TimeFrame, iBefore));
             }
             //CurrentYear Detailed erzeugen
             const oneDateThisYear = new Date();
@@ -427,27 +455,50 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {'number' | 'string' | 'boolean' | 'array' | 'object' | 'mixed' | 'file'} type
      */
     async _setExtendObject(oS, id, name, role, createIfnotExists, writeable, unit, type) {
+        name = await this._replaceTimeFrameInfo(name, id);
         if (!name.includes(" (" + oS.alias + ")")) {
             name += " (" + oS.alias + ")";
         }
-        const theObject = await this.getObjectAsync(oS.alias + id);
+        let theObject = await this._getObjectAsync(oS.alias + id);
         if (theObject == null || theObject.common.name != name || theObject.common.role != role || theObject.common.unit != unit || theObject.common.write != writeable || theObject.common.type != type) {
-            if (createIfnotExists || theObject != null)
-                await this.extendObjectAsync(oS.alias + id, {
-                    type: "state",
-                    common: {
-                        name: name,
-                        role: role,
-                        type: type,
-                        desc: `Created by ${this.namespace}`,
-                        unit: unit,
-                        read: true,
-                        write: writeable,
-                    },
-                    native: {}
-                });
+            if (createIfnotExists || theObject != null) {
+                if (theObject == null || theObject == undefined) {
+                    theObject = {
+                        type: "state",
+                        common: {
+                            desc: `Created by ${this.namespace}`
+                        },
+                        native: {}
+                    }
+                }
+                theObject.type = "state"
+                theObject.common.name = name
+                theObject.common.role = role
+                theObject.common.type = type
+                theObject.common.unit = unit
+                theObject.common.write = writeable
+                theObject.common.read = true
+
+                await this.setObjectAsync(oS.alias + id, theObject);
+                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id)
+
+            }
         }
 
+    }
+
+    /**
+     * Replace the Timeframe info on Datapoints with variable data (previous and Current History) with static Text (reduce ObjectChanges)
+     * @param {string} name
+     * @param {string} id
+     */
+    async _replaceTimeFrameInfo(name, id) {
+        if (this.writeTrimeFrameInfo == false) {
+            if (name.startsWith("Timeframe ") && !id.startsWith("20")) {
+                name = id.split(".").join(" ");
+            }
+        }
+        return name;
     }
     /**
      * Change or Create a iobroker Channel if necessary
@@ -457,22 +508,33 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {boolean} createIfnotExists
      */
     async _setExtendChannel(oS, id, name, createIfnotExists) {
+        name = await this._replaceTimeFrameInfo(name, id);
         if (!name.includes(" (" + oS.alias + ")")) {
             name += " (" + oS.alias + ")";
         }
-        const theObject = await this.getObjectAsync(oS.alias + id);
+        let theObject = await this._getObjectAsync(oS.alias + id);
         if (theObject == null || theObject == undefined || theObject.common.name != name || theObject.type != "channel") {
             if (createIfnotExists || theObject != null) {
-                await this.extendObjectAsync(oS.alias + id, {
-                    type: "channel",
-                    common: {
-                        name: name,
-                        desc: `Created by ${this.namespace}`,
-                    },
-                    native: {}
-                });
+                if (theObject == null || theObject == undefined) {
+                    theObject = {
+                        common: {
+                            desc: `Created by ${this.namespace}`
+                        },
+                        native: {}
+                    }
+                }
+                theObject.common.name = name
+                theObject.type = "channel"
+
+                await this.setObjectAsync(oS.alias + id, theObject);
+
+                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id)
+
             }
+
+
         }
+
 
     }
 
@@ -518,7 +580,7 @@ class valuetrackerovertime extends utils.Adapter {
         } else if (TimeFrame == TimeFrames.Year) {
             newdate.setFullYear(newdate.getFullYear() - beforeZähler);
         }
-        return "Data from " + await this._getTimeFrameInfo(TimeFrame, newdate);
+        return await this._getTimeFrameInfo(TimeFrame, newdate);
     }
 
 
@@ -528,30 +590,40 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {Date} theDate
      */
     async _getTimeFrameInfo(TimeFrame, theDate) {
+        let ret = ""
 
         if (TimeFrame == TimeFrames.Minute) {
-            return "minute " + theDate.toLocaleTimeString();
+            let dateoptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+
+            ret = "minute " + theDate.toLocaleString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Hour) {
-            return "hour " + theDate.toLocaleTimeString();
+            let dateoptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+            ret = "hour " + theDate.toLocaleString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Day) {
-            const MonthString = theDate.toLocaleString("en-us", { month: "long" });
-            const DateNumber = theDate.getDate().toString().padStart(2, "0");
-            return DateNumber + ". " + MonthString;
+            let dateoptions = { day: '2-digit', year: 'numeric', month: 'long' };
+            ret = theDate.toLocaleDateString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Week) {
             const theKW = new KWInfo(theDate);
-            return theKW.InfoString;
+            ret = theKW.InfoString;
         }
         else if (TimeFrame == TimeFrames.Month) {
-            const MonthString = theDate.toLocaleString("en-us", { month: "long" });
-            return (theDate.getMonth() + 1).toString().padStart(2, "0") + "_" + MonthString;
+            let dateoptions = { year: 'numeric', month: 'long' };
+            ret = theDate.toLocaleString(this.locale, dateoptions);
         }
         else if (TimeFrame == TimeFrames.Quarter) {
-            return "quarter " + await this._getQuarter(theDate);
+            let myquarter = await this._getQuarter(theDate)
+            let dateoptions = { month: 'short' };
+            ret = "quarter " + myquarter + " ";
+            ret += new Date(2020, (myquarter - 1) * 3 + 1, 1).toLocaleString(this.locale, dateoptions) + ","
+            ret += new Date(2020, (myquarter - 1) * 3 + 2, 1).toLocaleString(this.locale, dateoptions) + ","
+            ret += new Date(2020, (myquarter - 1) * 3 + 3, 1).toLocaleString(this.locale, dateoptions) + " "
+            ret += " " + theDate.getFullYear()
+
         }
         else if (TimeFrame == TimeFrames.Year) {
-            return "year " + theDate.getFullYear().toString();
+            ret = "year " + theDate.getFullYear().toString();
         }
-        return "";
+        return "Timeframe " + ret;
     }
 
     /**
@@ -578,7 +650,7 @@ class valuetrackerovertime extends utils.Adapter {
             return MonthNumber + "_" + MonthString;
         }
         else if (TimeFrame == TimeFrames.Quarter) {
-            return "quater_ " + this._getQuarter(theDate);
+            return "quater_" + await this._getQuarter(theDate);
         }
         else if (TimeFrame == TimeFrames.Year) {
             return TimeFramesNumber.Year + "_Year_" + theDate.getFullYear();
@@ -741,7 +813,10 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {number} value
      */
     async _setStartValue(oS, TimeFrame, value) {
+        oS.startValues[TimeFrame] = value
         await this._setStateRoundedAsync(oS, await this._getStartID(TimeFrame), value, false);
+        await this._calcCurrentTimeFrameValue(oS, new Date(), TimeFrame);
+
     }
     /**
      * Returns the startid
@@ -758,19 +833,26 @@ class valuetrackerovertime extends utils.Adapter {
      */
     async _getStartValue(oS, TimeFrame) {
         //Create the DP if not exists
-        const startID = await this._getStartID(TimeFrame);
+        if ((TimeFrame in oS.startValues)) {
+            return oS.startValues[TimeFrame]
+        } else {
+            const startID = await this._getStartID(TimeFrame);
 
-        await this._setExtendObject(oS, startID, "start_" + TimeFrame, "", true, true, oS.iobrokerObject.common.unit, "number");
-        //set startData if not set
-        const state = await this.getStateAsync(oS.alias + startID);
-        if (!state || state.val == null || state.val == undefined) {
-            const currentValue = await this._getNumberfromState(await this.getForeignStateAsync(oS.id));
-            await this._setStateRoundedAsync(oS, startID, currentValue, false);
-            return currentValue;
+            await this._setExtendObject(oS, startID, "start_" + TimeFrame, "", true, true, oS.iobrokerObject.common.unit, "number");
+            //set startData if not set
+            const state = await this.getStateAsync(oS.alias + startID);
+            if (state && state.val != null && Number(state.val) != Number.NaN) {
+                oS.startValues[TimeFrame] = Number(state.val);
+            }
+            else {
+                const currentValue = await this._getNumberfromState(await this.getForeignStateAsync(oS.id));
+                await this._setStateRoundedAsync(oS, startID, currentValue, false);
+                oS.startValues[TimeFrame] = currentValue;
+            }
+
         }
-        else {
-            return Number(state.val);
-        }
+        return oS.startValues[TimeFrame]
+
     }
 
     /**
@@ -823,7 +905,7 @@ class valuetrackerovertime extends utils.Adapter {
 
         let DPfilled = 0;
         let resetsDetected = 0;
-        const startvalues = {};
+        const hisstartvalues = {};
         let lastGoodValue = 0;
         let FirstWrongValue = NaN;
         let counterResetDetetion_CurrentCountAfterReset = 0;
@@ -841,67 +923,67 @@ class valuetrackerovertime extends utils.Adapter {
 
                 lastGoodValue = myHis.hisval;
                 for (const TimeFrame in TimeFrames) {
-                    startvalues[TimeFrame] = myHis.hisval;
+                    hisstartvalues[TimeFrame] = myHis.hisval;
 
 
                 }
             }
             else {
                 //TimeframeChange erkennen
-                let testDate = new Date(myHis.hisdate);
-                while (testDate.getDate() > LastHis.hisdate.getDate() || testDate.getMonth() > LastHis.hisdate.getMonth() || testDate.getFullYear() > LastHis.hisdate.getFullYear()) {
-                    testDate.setDate(testDate.getDate() - 1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, testDate, (lastGoodValue - startvalues[TimeFrames.Day]));
-                    TimeFrameValueData[TimeFrames.Day].push({ date: testDate, value: (lastGoodValue - startvalues[TimeFrames.Day]) })
+                let dateCheckIsOldTimeframe = new Date(LastHis.date);
 
-                    startvalues[TimeFrames.Day] = lastGoodValue;
+                while (myHis.date.getDate() > dateCheckIsOldTimeframe.getDate() || myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Day]));
+                    TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Day]) })
+                    hisstartvalues[TimeFrames.Day] = lastGoodValue;
+                    DPfilled++;
+                    dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 1);
+                }
+
+                dateCheckIsOldTimeframe = new Date(LastHis.date);
+
+                let dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
+                const myHisKWInfo = new KWInfo(myHis.date);
+                while (myHisKWInfo.weekNumber > dateCheckIsOldTimeframe_KWInfo.weekNumber || myHisKWInfo.yearOfThursday > dateCheckIsOldTimeframe_KWInfo.yearOfThursday) {
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Week]));
+                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Week]) })
+
+                    hisstartvalues[TimeFrames.Week] = lastGoodValue;
+                    DPfilled++;
+                    dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 7);
+                    dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
+
+                }
+
+                dateCheckIsOldTimeframe = new Date(LastHis.date);
+                while (myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Month]));
+                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Month]) })
+
+                    hisstartvalues[TimeFrames.Month] = lastGoodValue;
+
+                    DPfilled++;
+                    dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 1);
+                }
+
+                dateCheckIsOldTimeframe = new Date(LastHis.date);
+                while (Math.floor(myHis.date.getMonth() / 3) > Math.floor(dateCheckIsOldTimeframe.getMonth() / 3) || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Quarter]));
+                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Quarter]) })
+
+                    hisstartvalues[TimeFrames.Quarter] = lastGoodValue;
+                    dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 3);
                     DPfilled++;
                 }
 
-                testDate = new Date(myHis.hisdate);
+                dateCheckIsOldTimeframe = new Date(LastHis.date);
+                while (myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Year]));
+                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Year]) })
 
-                let testDateKWInfo = new KWInfo(testDate);
-                const LastHisKWInfo = new KWInfo(LastHis.hisdate);
-
-                while (testDateKWInfo.weekNumber > LastHisKWInfo.weekNumber || testDateKWInfo.yearOfThursday > LastHisKWInfo.yearOfThursday) {
-                    testDate.setDate(testDate.getDate() - 7);
-                    testDateKWInfo = new KWInfo(testDate);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, testDate, (lastGoodValue - startvalues[TimeFrames.Week]));
-                    TimeFrameValueData[TimeFrames.Week].push({ date: testDate, value: (lastGoodValue - startvalues[TimeFrames.Week]) })
-
-                    startvalues[TimeFrames.Week] = lastGoodValue;
+                    hisstartvalues[TimeFrames.Year] = lastGoodValue;
                     DPfilled++;
-                }
-
-                testDate = new Date(myHis.hisdate);
-                while (testDate.getMonth() > LastHis.hisdate.getMonth() || testDate.getFullYear() > LastHis.hisdate.getFullYear()) {
-                    testDate.setMonth(testDate.getMonth() - 1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, testDate, (lastGoodValue - startvalues[TimeFrames.Month]));
-                    TimeFrameValueData[TimeFrames.Month].push({ date: testDate, value: (lastGoodValue - startvalues[TimeFrames.Month]) })
-
-                    startvalues[TimeFrames.Month] = lastGoodValue;
-
-                    DPfilled++;
-                }
-
-                testDate = new Date(myHis.hisdate);
-                while (Math.floor(testDate.getMonth() / 3) > Math.floor(LastHis.hisdate.getMonth() / 3) || testDate.getFullYear() > LastHis.hisdate.getFullYear()) {
-                    testDate.setMonth(testDate.getMonth() - 3);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, testDate, (lastGoodValue - startvalues[TimeFrames.Quarter]));
-                    TimeFrameValueData[TimeFrames.Quarter].push({ date: testDate, value: (lastGoodValue - startvalues[TimeFrames.Quarter]) })
-
-                    startvalues[TimeFrames.Quarter] = lastGoodValue;
-                    DPfilled++;
-                }
-
-                testDate = new Date(myHis.hisdate);
-                while (testDate.getFullYear() > LastHis.hisdate.getFullYear()) {
-                    testDate.setFullYear(testDate.getFullYear() - 1);
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, testDate, (lastGoodValue - startvalues[TimeFrames.Year]));
-                    TimeFrameValueData[TimeFrames.Year].push({ date: testDate, value: (lastGoodValue - startvalues[TimeFrames.Year]) })
-
-                    startvalues[TimeFrames.Year] = lastGoodValue;
-                    DPfilled++;
+                    dateCheckIsOldTimeframe.setFullYear(dateCheckIsOldTimeframe.getFullYear() + 1);
                 }
 
 
@@ -929,7 +1011,7 @@ class valuetrackerovertime extends utils.Adapter {
                         FirstWrongValue = NaN;
                         resetsDetected++;
                         for (const TimeFrame in TimeFrames) {
-                            startvalues[TimeFrame] = startvalues[TimeFrame] - theAnpassung;
+                            hisstartvalues[TimeFrame] = hisstartvalues[TimeFrame] - theAnpassung;
                         }
 
                     }
@@ -948,16 +1030,24 @@ class valuetrackerovertime extends utils.Adapter {
         }
 
         for (let TimeFrame in TimeFrames) {
-            /** @type {Array<{date:Date, value:Number}>} */
-            let MyTimeFrameData = TimeFrameValueData[TimeFrame]
-            for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
-                if (MyTimeFrameData.length > zahler ) {
-                    await this._pushNewPreviousSates(oS, TimeFrame,  MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0))
+            if (!(TimeFrame == TimeFrames.Minute || TimeFrame == TimeFrames.Hour)) {
+                /** @type {Array<{date:Date, value:Number}>} */
+                let MyTimeFrameData = TimeFrameValueData[TimeFrame]
+                for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
+                    if (MyTimeFrameData.length >= zahler) {
+                        await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0))
+                    }
+                    else {
+                        //set no data yet
+                        await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data")
+
+                    }
                 }
+
+                await this._setStartValue(oS, TimeFrame, hisstartvalues[TimeFrame])
+
             }
-
         }
-
 
 
         this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + DPfilled + " Resets detected: " + resetsDetected);

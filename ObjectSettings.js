@@ -18,6 +18,7 @@ class ObjectSettings {
         this.FirstWrongValue = Number.NaN;
         this.lastWrongValue = Number.NaN;
         this.counterResetDetetion_CurrentCountAfterReset = 0;
+        this.startValues = {}
     }
 
 

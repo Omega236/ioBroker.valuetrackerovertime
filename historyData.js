@@ -14,7 +14,7 @@ class historyData {
             }
         }
         this.hisval = val;
-        this.hisdate = ts;
+        this.date = ts;
     }
 
 }
