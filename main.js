@@ -24,7 +24,7 @@ const TimeFrames = {
     Year: "Year"
 };
 
-var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const TimeFramesNumber = {
     Minute: "001",
@@ -55,15 +55,15 @@ class valuetrackerovertime extends utils.Adapter {
         this.on("stateChange", this.onStateChange.bind(this));
         this.on("objectChange", this.onObjectChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
-        this.writeTrimeFrameInfo = true
-        this.locale = "en-US"
+        this.writeTrimeFrameInfo = true;
+        this.locale = "en-US";
 
     }
 
     async _getObjectAsync(ObjectID) {
 
         if (!(ObjectID in this.myObjects)) {
-            this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID)
+            this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID);
         }
         return this.myObjects[ObjectID];
     }
@@ -133,7 +133,7 @@ class valuetrackerovertime extends utils.Adapter {
                     if (oS.alias == idsplit[2]) {
 
                         this.log.warn(id + " changed, recalc Timeframe, old-Value: " + await this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
-                        await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state))
+                        await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state));
 
 
 
@@ -469,18 +469,18 @@ class valuetrackerovertime extends utils.Adapter {
                             desc: `Created by ${this.namespace}`
                         },
                         native: {}
-                    }
+                    };
                 }
-                theObject.type = "state"
-                theObject.common.name = name
-                theObject.common.role = role
-                theObject.common.type = type
-                theObject.common.unit = unit
-                theObject.common.write = writeable
-                theObject.common.read = true
+                theObject.type = "state";
+                theObject.common.name = name;
+                theObject.common.role = role;
+                theObject.common.type = type;
+                theObject.common.unit = unit;
+                theObject.common.write = writeable;
+                theObject.common.read = true;
 
                 await this.setObjectAsync(oS.alias + id, theObject);
-                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id)
+                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id);
 
             }
         }
@@ -521,14 +521,14 @@ class valuetrackerovertime extends utils.Adapter {
                             desc: `Created by ${this.namespace}`
                         },
                         native: {}
-                    }
+                    };
                 }
-                theObject.common.name = name
-                theObject.type = "channel"
+                theObject.common.name = name;
+                theObject.type = "channel";
 
                 await this.setObjectAsync(oS.alias + id, theObject);
 
-                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id)
+                this.myObjects[oS.alias + id] = await this._getObjectAsync(oS.alias + id);
 
             }
 
@@ -590,34 +590,34 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {Date} theDate
      */
     async _getTimeFrameInfo(TimeFrame, theDate) {
-        let ret = ""
+        let ret = "";
 
         if (TimeFrame == TimeFrames.Minute) {
-            let dateoptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+            const dateoptions = { hour: "2-digit", minute: "2-digit", hour12: false };
 
             ret = "minute " + theDate.toLocaleString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Hour) {
-            let dateoptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+            const dateoptions = { hour: "2-digit", minute: "2-digit", hour12: false };
             ret = "hour " + theDate.toLocaleString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Day) {
-            let dateoptions = { day: '2-digit', year: 'numeric', month: 'long' };
+            const dateoptions = { day: "2-digit", year: "numeric", month: "long" };
             ret = theDate.toLocaleDateString(this.locale, dateoptions);
         } else if (TimeFrame == TimeFrames.Week) {
             const theKW = new KWInfo(theDate);
             ret = theKW.InfoString;
         }
         else if (TimeFrame == TimeFrames.Month) {
-            let dateoptions = { year: 'numeric', month: 'long' };
+            const dateoptions = { year: "numeric", month: "long" };
             ret = theDate.toLocaleString(this.locale, dateoptions);
         }
         else if (TimeFrame == TimeFrames.Quarter) {
-            let myquarter = await this._getQuarter(theDate)
-            let dateoptions = { month: 'short' };
+            const myquarter = await this._getQuarter(theDate);
+            const dateoptions = { month: "short" };
             ret = "quarter " + myquarter + " ";
-            ret += new Date(2020, (myquarter - 1) * 3 + 1, 1).toLocaleString(this.locale, dateoptions) + ","
-            ret += new Date(2020, (myquarter - 1) * 3 + 2, 1).toLocaleString(this.locale, dateoptions) + ","
-            ret += new Date(2020, (myquarter - 1) * 3 + 3, 1).toLocaleString(this.locale, dateoptions) + " "
-            ret += " " + theDate.getFullYear()
+            ret += new Date(2020, (myquarter - 1) * 3 + 1, 1).toLocaleString(this.locale, dateoptions) + ",";
+            ret += new Date(2020, (myquarter - 1) * 3 + 2, 1).toLocaleString(this.locale, dateoptions) + ",";
+            ret += new Date(2020, (myquarter - 1) * 3 + 3, 1).toLocaleString(this.locale, dateoptions) + " ";
+            ret += " " + theDate.getFullYear();
 
         }
         else if (TimeFrame == TimeFrames.Year) {
@@ -732,20 +732,17 @@ class valuetrackerovertime extends utils.Adapter {
     async _CreateAndGetObjectIdDetailedCurrent(oS, TimeFrame, date) {
         if (oS.detailed_current(TimeFrame)) {
             let mydetailedObjectId = "";
-            let Checkdate = new Date()
-            Checkdate.setHours(24)
-            Checkdate.setMinutes(0)
+            const Checkdate = new Date();
+            Checkdate.setHours(24);
+            Checkdate.setMinutes(0);
 
-            if (TimeFrame == TimeFrames.Year) {
-
-            }
-            else {
+            if (TimeFrame != TimeFrames.Year) {
                 mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
                 await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
                 if (TimeFrame == TimeFrames.Day) {
-                    Checkdate.setDate(Checkdate.getDate() - 7)
+                    Checkdate.setDate(Checkdate.getDate() - 7);
                     if (date >= Checkdate) {
-                        let myDayNumber = date.getDay()
+                        let myDayNumber = date.getDay();
                         if (myDayNumber == 0)
                             myDayNumber = 7;
                         mydetailedObjectId = mydetailedObjectId + "." + myDayNumber + "_" + days[date.getDay()];
@@ -754,11 +751,10 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Week) {
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1)
+                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
 
                     if (date >= Checkdate) {
                         {
-                            const theKWInfo = new KWInfo(date);
                             mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Week, date);
                             await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Week, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
                             return mydetailedObjectId;
@@ -767,9 +763,9 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Month) {
-                    Checkdate.setMonth(Checkdate.getMonth() + 1)
-                    Checkdate.setDate(1)
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1)
+                    Checkdate.setMonth(Checkdate.getMonth() + 1);
+                    Checkdate.setDate(1);
+                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
                     if (date >= Checkdate) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Month, date);
@@ -779,9 +775,9 @@ class valuetrackerovertime extends utils.Adapter {
                 }
 
                 if (TimeFrame == TimeFrames.Quarter) {
-                    Checkdate.setMonth(Checkdate.getMonth() + 3 - (Checkdate.getMonth() % 3))
-                    Checkdate.setDate(1)
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1)
+                    Checkdate.setMonth(Checkdate.getMonth() + 3 - (Checkdate.getMonth() % 3));
+                    Checkdate.setDate(1);
+                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
                     if (date >= Checkdate) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Quarter, date);
@@ -813,7 +809,7 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {number} value
      */
     async _setStartValue(oS, TimeFrame, value) {
-        oS.startValues[TimeFrame] = value
+        oS.startValues[TimeFrame] = value;
         await this._setStateRoundedAsync(oS, await this._getStartID(TimeFrame), value, false);
         await this._calcCurrentTimeFrameValue(oS, new Date(), TimeFrame);
 
@@ -834,7 +830,7 @@ class valuetrackerovertime extends utils.Adapter {
     async _getStartValue(oS, TimeFrame) {
         //Create the DP if not exists
         if ((TimeFrame in oS.startValues)) {
-            return oS.startValues[TimeFrame]
+            return oS.startValues[TimeFrame];
         } else {
             const startID = await this._getStartID(TimeFrame);
 
@@ -851,7 +847,7 @@ class valuetrackerovertime extends utils.Adapter {
             }
 
         }
-        return oS.startValues[TimeFrame]
+        return oS.startValues[TimeFrame];
 
     }
 
@@ -911,9 +907,9 @@ class valuetrackerovertime extends utils.Adapter {
         let counterResetDetetion_CurrentCountAfterReset = 0;
         let lastWrongValue = NaN;
 
-        let TimeFrameValueData = {};
-        for (let TimeFrame in TimeFrames) {
-            TimeFrameValueData[TimeFrame] = []
+        const TimeFrameValueData = {};
+        for (const TimeFrame in TimeFrames) {
+            TimeFrameValueData[TimeFrame] = [];
         }
 
         let LastHis;
@@ -934,7 +930,7 @@ class valuetrackerovertime extends utils.Adapter {
 
                 while (myHis.date.getDate() > dateCheckIsOldTimeframe.getDate() || myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Day]));
-                    TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Day]) })
+                    TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Day]) });
                     hisstartvalues[TimeFrames.Day] = lastGoodValue;
                     DPfilled++;
                     dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 1);
@@ -946,7 +942,7 @@ class valuetrackerovertime extends utils.Adapter {
                 const myHisKWInfo = new KWInfo(myHis.date);
                 while (myHisKWInfo.weekNumber > dateCheckIsOldTimeframe_KWInfo.weekNumber || myHisKWInfo.yearOfThursday > dateCheckIsOldTimeframe_KWInfo.yearOfThursday) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Week]));
-                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Week]) })
+                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Week]) });
 
                     hisstartvalues[TimeFrames.Week] = lastGoodValue;
                     DPfilled++;
@@ -958,7 +954,7 @@ class valuetrackerovertime extends utils.Adapter {
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Month]));
-                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Month]) })
+                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Month]) });
 
                     hisstartvalues[TimeFrames.Month] = lastGoodValue;
 
@@ -969,7 +965,7 @@ class valuetrackerovertime extends utils.Adapter {
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (Math.floor(myHis.date.getMonth() / 3) > Math.floor(dateCheckIsOldTimeframe.getMonth() / 3) || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Quarter]));
-                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Quarter]) })
+                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Quarter]) });
 
                     hisstartvalues[TimeFrames.Quarter] = lastGoodValue;
                     dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 3);
@@ -979,7 +975,7 @@ class valuetrackerovertime extends utils.Adapter {
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Year]));
-                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Year]) })
+                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Year]) });
 
                     hisstartvalues[TimeFrames.Year] = lastGoodValue;
                     DPfilled++;
@@ -1029,22 +1025,22 @@ class valuetrackerovertime extends utils.Adapter {
 
         }
 
-        for (let TimeFrame in TimeFrames) {
+        for (const TimeFrame in TimeFrames) {
             if (!(TimeFrame == TimeFrames.Minute || TimeFrame == TimeFrames.Hour)) {
                 /** @type {Array<{date:Date, value:Number}>} */
-                let MyTimeFrameData = TimeFrameValueData[TimeFrame]
+                const MyTimeFrameData = TimeFrameValueData[TimeFrame];
                 for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
                     if (MyTimeFrameData.length >= zahler) {
-                        await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0))
+                        await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0));
                     }
                     else {
                         //set no data yet
-                        await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data")
+                        await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data");
 
                     }
                 }
 
-                await this._setStartValue(oS, TimeFrame, hisstartvalues[TimeFrame])
+                await this._setStartValue(oS, TimeFrame, hisstartvalues[TimeFrame]);
 
             }
         }
