@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.4.1",
+        "version": "0.5.1",
         "news": {
+           "0.5.1": {
+                "en": "optimizations, HistoryAnalyse extended and CurrentHistory added"
+           },
           "0.4.1": {
             "en": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi",
             "de": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi"
@@ -105,7 +108,12 @@
     "detailed_days": false,
     "detailed_weeks": true,
     "detailed_months": true,
+    "detailed_quarter": true,
     "detailed_years": true,
+    "detailed_current_days": true,
+    "detailed_current_weeks": false,
+    "detailed_current_months": true,
+    "detailed_current_quarters": true,
     "before_minutes": -1,
     "before_hours": -1,
     "before_days": 7,

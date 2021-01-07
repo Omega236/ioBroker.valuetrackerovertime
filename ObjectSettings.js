@@ -18,8 +18,7 @@ class ObjectSettings {
         this.FirstWrongValue = Number.NaN;
         this.lastWrongValue = Number.NaN;
         this.counterResetDetetion_CurrentCountAfterReset = 0;
-        this. initialFinished = false;
-
+        this.startValues = {}
     }
 
 
@@ -64,37 +63,34 @@ class ObjectSettings {
 
 
 
-
-    /**
-  * Update the iobroker Object
-  * @param {ioBroker.Object } iobrokerObject
-  */
-    updateSettings(iobrokerObject) {
-        const OldAlias = this.alias;
-        this.iobrokerObject = iobrokerObject;
-        if (OldAlias != this.alias)
-        {
-            this.lastGoodValue = 0;
-            this.FirstWrongValue = Number.NaN;
-            this.lastWrongValue = Number.NaN;
-            this.counterResetDetetion_CurrentCountAfterReset = 0;
-            this.initialFinished = false;
-
-        }
-        this.initialFinished = false;
-    }
-
     /**
   * returns the
   * @param {string} TimeFrame
-  * @returns {boolean}
+* @returns {boolean}
   */
     detailed(TimeFrame) {
         if (TimeFrame == "Minute" || TimeFrame == "Hour")
             return false;
-        return this.myCustomSettings["detailed_" + TimeFrame.toLowerCase() + "s"];
+
+        let asd = "detailed_" + TimeFrame.toLowerCase() + "s"  
+        let ret =  this.myCustomSettings[asd];
+        return ret;
 
     }
+     /**
+  * returns the
+  * @param {string} TimeFrame
+* @returns {boolean}
+  */
+ detailed_current(TimeFrame) {
+    if (TimeFrame == "Minute" || TimeFrame == "Hour")
+        return false;
+
+    let asd = "detailed_" +  "current_" + TimeFrame.toLowerCase() + "s"  
+    let ret =  this.myCustomSettings[asd];
+    return ret;
+
+}
 
     /**
   * returns the Count of Current/Previous Datapoints

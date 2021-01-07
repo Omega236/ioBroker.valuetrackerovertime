@@ -11,6 +11,7 @@
 [![NPM](https://nodei.co/npm/iobroker.valuetrackerovertime.png?downloads=true)](https://nodei.co/npm/iobroker.valuetrackerovertime/)
 
 **Tests:** [![Travis-CI](http://img.shields.io/travis/Omega236/ioBroker.valuetrackerovertime/master.svg)](https://travis-ci.org/Omega236/ioBroker.valuetrackerovertime)
+[![Build Status](https://travis-ci.com/Omega236/ioBroker.valuetrackerovertime.svg?branch=master)](https://travis-ci.com/Omega236/ioBroker.valuetrackerovertime)
 
 ## valuetrackerovertime adapter for ioBroker
 Tracks all numbers and their increase/decrease. The data then will be used to build statistics on the rate of change, displayed in times such as hours, days, weeks, months, quarters and years. The collected data can be used to visualize i.e. the power consumption in charts.
@@ -74,7 +75,7 @@ In the picture there are three examples given. Since the screenshot was taken on
 ## License
 MIT License
 
-Copyright (c) 2020 Omega236 <general.of.omega@googlemail.com>
+Copyright (c) 2021 Omega236 <general.of.omega@googlemail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
