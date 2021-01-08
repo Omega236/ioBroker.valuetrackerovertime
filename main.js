@@ -118,20 +118,21 @@ class valuetrackerovertime extends utils.Adapter {
             if (id in this.dicDatas) {
                 await this._publishCurrentValue(this.dicDatas[id], new Date(state.ts), await this._getNumberfromState(state));
             }
-            else if (!state.ack && id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
+            else if ( id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
                 const TimeFrame = id.substring(id.lastIndexOf("_") + 1);
                 const idsplit = id.split(".");
                 for (const oneoSID in this.dicDatas) {
                     /**@type {ObjectSettings} */
                     const oS = this.dicDatas[oneoSID];
                     if (oS.alias == idsplit[2]) {
-
-                        this.log.warn(id + " changed, recalc Timeframe, old-Value: " + await this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
-                        await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state));
-
-
-
-
+                        
+                        if (state.ack){
+                            oS.startValues[TimeFrame] = await this._getNumberfromState(state);
+                        }
+                        else{
+                            this.log.warn(id + " changed, recalc Timeframe, old-Value: " + await this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
+                            await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state));
+                        }
                     }
                 }
 
@@ -888,6 +889,7 @@ class valuetrackerovertime extends utils.Adapter {
                 for (const one in gethistory["result"]) {
                     allData.push(new historyData(gethistory["result"][one].ts, gethistory["result"][one].val));
                 }
+                allData.push(new historyData(new Date(), oS.lastGoodValue))
                 await this._readDetailedFromHisory(oS, allData);
 
             }
