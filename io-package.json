@@ -1,9 +1,12 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.5.2",
+        "version": "0.5.3",
         "news": {
-            "0.5.2": {
+            "0.5.3": {
+                "en": "bugfix startvalue not used after SQL read out"
+           },
+           "0.5.2": {
                 "en": "bugfix _getObjectAsync not worked"
            },
            "0.5.1": {
