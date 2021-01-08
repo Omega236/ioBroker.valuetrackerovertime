@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.5.1",
+        "version": "0.5.2",
         "news": {
+            "0.5.2": {
+                "en": "bugfix _getObjectAsync not worked"
+           },
            "0.5.1": {
                 "en": "optimizations, HistoryAnalyse extended and CurrentHistory added"
            },

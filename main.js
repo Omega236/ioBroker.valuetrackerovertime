@@ -60,13 +60,7 @@ class valuetrackerovertime extends utils.Adapter {
 
     }
 
-    async _getObjectAsync(ObjectID) {
 
-        if (!(ObjectID in this.myObjects)) {
-            this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID);
-        }
-        return this.myObjects[ObjectID];
-    }
 
 
 
@@ -109,7 +103,7 @@ class valuetrackerovertime extends utils.Adapter {
      */
     async onObjectChange(id, obj) {
         if (id.startsWith(this.namespace)) {
-            this.myObjects[id.substring(0, this.namespace.length + 1)] = obj;
+            this.myObjects[id.substring(this.namespace.length + 1)] = obj;
         }
         await this._initialObject(obj);
     }
@@ -194,13 +188,17 @@ class valuetrackerovertime extends utils.Adapter {
     async initialObjects() {
         this.log.info("inital all Objects");
 
+
+        const objectschannels = await this.getForeignObjectsAsync(this.namespace + "*", "channel");
+        for (const id in objectschannels) {
+                this.myObjects[id.substring(this.namespace.length + 1)] = objectschannels[id];
+
+        }
         // read out all Objects
         const objects = await this.getForeignObjectsAsync("", "state", null);
-
-
         for (const id in objects) {
             if (id.startsWith(this.namespace)) {
-                this.myObjects[id.substring(0, this.namespace.length + 1)] = objects[id];
+                this.myObjects[id.substring(this.namespace.length + 1)] = objects[id];
             }
 
         }
@@ -210,6 +208,15 @@ class valuetrackerovertime extends utils.Adapter {
         }
         this.log.info("initial completed");
     }
+
+    async _getObjectAsync(ObjectID) {
+
+        if (!(ObjectID in this.myObjects)) {
+            this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID);
+        }
+        return this.myObjects[ObjectID];
+    }
+
 
     /**
      * Try to Initial an Datapoint (if Custom Setting exists, otherwise it is uninitial)
