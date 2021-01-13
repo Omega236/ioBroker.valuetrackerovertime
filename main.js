@@ -13,7 +13,7 @@ const cron = require("node-cron"); // Cron Schedulervar
 const ObjectSettings = require("./ObjectSettings.js");
 const historyData = require("./historyData.js");
 const KWInfo = require("./KWInfo.js");
-const DateHelper = require("./DateHelper.js");
+const DateHelper = require("./dateHelper.js");
 
 const TimeFrames = {
     Minute: "Minute",
