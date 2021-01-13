@@ -42,7 +42,7 @@ class DateHelper {
      * @returns {string}
      */
     static GetMonthName(date) {
-        return monthnames[date.getMonth()];
+        return DateHelper.monthnames[date.getMonth()];
     }
     /**
      * Returns 'MM'
@@ -50,7 +50,7 @@ class DateHelper {
      * @returns {string}
      */
     static GetMonthNamefromNumber(monthnumber) {
-        return monthnames[monthnumber];
+        return DateHelper.monthnames[monthnumber];
     }
 
     /**

@@ -1,5 +1,5 @@
 "use strict";
-const DateHelper = require("./DateHelper.js");
+const DateHelper = require("./dateHelper.js");
 class KWInfo {
 
     /**
