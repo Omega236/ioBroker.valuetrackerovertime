@@ -13,6 +13,7 @@ const cron = require("node-cron"); // Cron Schedulervar
 const ObjectSettings = require("./ObjectSettings.js");
 const historyData = require("./historyData.js");
 const KWInfo = require("./KWInfo.js");
+const DateHelper = require("./DateHelper.js");
 
 const TimeFrames = {
     Minute: "Minute",
@@ -56,7 +57,6 @@ class valuetrackerovertime extends utils.Adapter {
         this.on("objectChange", this.onObjectChange.bind(this));
         this.on("unload", this.onUnload.bind(this));
         this.writeTrimeFrameInfo = true;
-        this.locale = "en-US";
 
     }
 
@@ -102,9 +102,7 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {ioBroker.Object | null | undefined} obj
      */
     async onObjectChange(id, obj) {
-        if (id.startsWith(this.namespace)) {
-            this.myObjects[id.substring(this.namespace.length + 1)] = obj;
-        }
+        await this._setMyObject(id, obj)
         await this._initialObject(obj);
     }
 
@@ -118,18 +116,18 @@ class valuetrackerovertime extends utils.Adapter {
             if (id in this.dicDatas) {
                 await this._publishCurrentValue(this.dicDatas[id], new Date(state.ts), await this._getNumberfromState(state));
             }
-            else if ( id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
+            else if (id.startsWith(this.namespace) && id.includes("_startValues.start_")) {
                 const TimeFrame = id.substring(id.lastIndexOf("_") + 1);
                 const idsplit = id.split(".");
                 for (const oneoSID in this.dicDatas) {
                     /**@type {ObjectSettings} */
                     const oS = this.dicDatas[oneoSID];
                     if (oS.alias == idsplit[2]) {
-                        
-                        if (state.ack){
+
+                        if (state.ack) {
                             oS.startValues[TimeFrame] = await this._getNumberfromState(state);
                         }
-                        else{
+                        else {
                             this.log.warn(id + " changed, recalc Timeframe, old-Value: " + await this._getStartValue(oS, TimeFrame) + " new-value: " + await this._getNumberfromState(state));
                             await this._setStartValue(oS, TimeFrame, await this._getNumberfromState(state));
                         }
@@ -192,16 +190,12 @@ class valuetrackerovertime extends utils.Adapter {
 
         const objectschannels = await this.getForeignObjectsAsync(this.namespace + "*", "channel");
         for (const id in objectschannels) {
-                this.myObjects[id.substring(this.namespace.length + 1)] = objectschannels[id];
-
+            await this._setMyObject(id, objectschannels[id])
         }
         // read out all Objects
         const objects = await this.getForeignObjectsAsync("", "state", null);
         for (const id in objects) {
-            if (id.startsWith(this.namespace)) {
-                this.myObjects[id.substring(this.namespace.length + 1)] = objects[id];
-            }
-
+            await this._setMyObject(id, objectschannels[id])
         }
         for (const id in objects) {
             await this._initialObject(objects[id]);
@@ -216,6 +210,12 @@ class valuetrackerovertime extends utils.Adapter {
             this.myObjects[ObjectID] = await this.getObjectAsync(ObjectID);
         }
         return this.myObjects[ObjectID];
+    }
+
+    _setMyObject(id, obj) {
+        if (id.startsWith(this.namespace)) {
+            this.myObjects[id.substring(this.namespace.length + 1)] = obj;
+        }
     }
 
 
@@ -601,32 +601,25 @@ class valuetrackerovertime extends utils.Adapter {
         let ret = "";
 
         if (TimeFrame == TimeFrames.Minute) {
-            const dateoptions = { hour: "2-digit", minute: "2-digit", hour12: false };
-
-            ret = "minute " + theDate.toLocaleString(this.locale, dateoptions);
+            ret = "minute " + DateHelper.GetTime(theDate);
         } else if (TimeFrame == TimeFrames.Hour) {
-            const dateoptions = { hour: "2-digit", minute: "2-digit", hour12: false };
-            ret = "hour " + theDate.toLocaleString(this.locale, dateoptions);
+            ret = "hour " + DateHelper.GetTime(theDate);
         } else if (TimeFrame == TimeFrames.Day) {
-            const dateoptions = { day: "2-digit", year: "numeric", month: "long" };
-            ret = theDate.toLocaleDateString(this.locale, dateoptions);
+            ret = `${DateHelper.GetDateNumber(theDate)} ${DateHelper.GetMonthName(theDate)} ${theDate.getFullYear()}`;
         } else if (TimeFrame == TimeFrames.Week) {
             const theKW = new KWInfo(theDate);
             ret = theKW.InfoString;
         }
         else if (TimeFrame == TimeFrames.Month) {
-            const dateoptions = { year: "numeric", month: "long" };
-            ret = theDate.toLocaleString(this.locale, dateoptions);
+            ret = `${DateHelper.GetMonthName(theDate)} ${theDate.getFullYear()}`;
         }
         else if (TimeFrame == TimeFrames.Quarter) {
             const myquarter = await this._getQuarter(theDate);
-            const dateoptions = { month: "short" };
             ret = "quarter " + myquarter + " ";
-            ret += new Date(2020, (myquarter - 1) * 3 + 1, 1).toLocaleString(this.locale, dateoptions) + ",";
-            ret += new Date(2020, (myquarter - 1) * 3 + 2, 1).toLocaleString(this.locale, dateoptions) + ",";
-            ret += new Date(2020, (myquarter - 1) * 3 + 3, 1).toLocaleString(this.locale, dateoptions) + " ";
+            ret += DateHelper.GetMonthNamefromNumber((myquarter - 1) * 3 + 0) + ",";
+            ret += DateHelper.GetMonthNamefromNumber((myquarter - 1) * 3 + 1) + ",";
+            ret += DateHelper.GetMonthNamefromNumber((myquarter - 1) * 3 + 2) + " ";
             ret += " " + theDate.getFullYear();
-
         }
         else if (TimeFrame == TimeFrames.Year) {
             ret = "year " + theDate.getFullYear().toString();
@@ -642,20 +635,17 @@ class valuetrackerovertime extends utils.Adapter {
     async _getTimeFrameObjectID(TimeFrame, theDate) {
 
         if (TimeFrame == TimeFrames.Minute) {
-            return "minute_" + theDate.toLocaleTimeString();
+            return "not valid";
         } else if (TimeFrame == TimeFrames.Hour) {
-            return "hour_" + theDate.toLocaleTimeString();
+            return "not valid";
         } else if (TimeFrame == TimeFrames.Day) {
-            const DateNumber = theDate.getDate().toString().padStart(2, "0");
-            return DateNumber;
+            return DateHelper.GetDateNumber(theDate);
         } else if (TimeFrame == TimeFrames.Week) {
             const theKW = new KWInfo(theDate);
-            return "KW" + theKW.weekNumber.toString().padStart(2, "0");
+            return "KW" + theKW.weekNumberString;
         }
         else if (TimeFrame == TimeFrames.Month) {
-            const MonthNumber = (theDate.getMonth() + 1).toString().padStart(2, "0");
-            const MonthString = theDate.toLocaleString("en-us", { month: "long" });
-            return MonthNumber + "_" + MonthString;
+            return DateHelper.GetMonthNumber(theDate) + "_" + DateHelper.GetMonthName(theDate);
         }
         else if (TimeFrame == TimeFrames.Quarter) {
             return "quater_" + await this._getQuarter(theDate);
