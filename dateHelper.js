@@ -1,9 +1,10 @@
 "use strict";
 
-const monthnames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
 class DateHelper {
+
+    static monthnames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
     static Padded(topad) {
