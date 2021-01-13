@@ -1,10 +1,9 @@
 "use strict";
 
+const monthnames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
 class DateHelper {
-
-    static monthnames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
     static Padded(topad) {
@@ -42,7 +41,7 @@ class DateHelper {
      * @returns {string}
      */
     static GetMonthName(date) {
-        return DateHelper.monthnames[date.getMonth()];
+        return monthnames[date.getMonth()];
     }
     /**
      * Returns 'MM'
@@ -50,7 +49,7 @@ class DateHelper {
      * @returns {string}
      */
     static GetMonthNamefromNumber(monthnumber) {
-        return DateHelper.monthnames[monthnumber];
+        return monthnames[monthnumber];
     }
 
     /**
