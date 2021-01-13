@@ -102,7 +102,6 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {ioBroker.Object | null | undefined} obj
      */
     async onObjectChange(id, obj) {
-        await this._setMyObject(id, obj)
         await this._initialObject(obj);
     }
 
@@ -190,13 +189,10 @@ class valuetrackerovertime extends utils.Adapter {
 
         const objectschannels = await this.getForeignObjectsAsync(this.namespace + "*", "channel");
         for (const id in objectschannels) {
-            await this._setMyObject(id, objectschannels[id])
+            await this._setMyObject(id, objectschannels[id]);
         }
         // read out all Objects
         const objects = await this.getForeignObjectsAsync("", "state", null);
-        for (const id in objects) {
-            await this._setMyObject(id, objectschannels[id])
-        }
         for (const id in objects) {
             await this._initialObject(objects[id]);
 
@@ -225,6 +221,8 @@ class valuetrackerovertime extends utils.Adapter {
      * */
     async _initialObject(iobrokerObject) {
         if (iobrokerObject && iobrokerObject != undefined) {
+            await this._setMyObject(iobrokerObject._id, iobrokerObject);
+
             // uninitialize ID
             if (iobrokerObject._id in this.dicDatas) {
                 this.log.info("disable : " + iobrokerObject._id);
@@ -879,7 +877,7 @@ class valuetrackerovertime extends utils.Adapter {
                 for (const one in gethistory["result"]) {
                     allData.push(new historyData(gethistory["result"][one].ts, gethistory["result"][one].val));
                 }
-                allData.push(new historyData(new Date(), oS.lastGoodValue))
+                allData.push(new historyData(new Date(), oS.lastGoodValue));
                 await this._readDetailedFromHisory(oS, allData);
 
             }
