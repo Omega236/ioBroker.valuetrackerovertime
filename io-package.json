@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.5.3",
+        "version": "0.5.4",
         "news": {
+            "0.5.4": {
+                "en": "Optimize RAM-Usage (Remove .toLocaleString)"
+           },
             "0.5.3": {
                 "en": "bugfix startvalue not used after SQL read out"
            },

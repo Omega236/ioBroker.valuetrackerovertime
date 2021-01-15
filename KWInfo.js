@@ -1,5 +1,5 @@
 "use strict";
-
+const DateHelper = require("./dateHelper.js");
 class KWInfo {
 
     /**
@@ -37,8 +37,8 @@ class KWInfo {
         // +1 we start with week number 1
         // +0.5 an easy and dirty way to round result (in combinationen with Math.floor)
         this.weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000 / 7);
-        this.InfoString = "KW_" + this.weekNumber + " (" + this.weekstart.getDate().toString().padStart(2, "0") + "." + (this.weekstart.getMonth() + 1).toString().padStart(2, "0") + "." + this.weekstart.getFullYear() + " - " + this.weekends.getDate().toString().padStart(2, "0") + "." + (this.weekends.getMonth() + 1).toString().padStart(2, "0") + "." + this.weekends.getFullYear() + ")";
-
+        this.InfoString = `KW_${this.weekNumber} (${DateHelper.GetGermanDate(this.weekstart)} - ${DateHelper.GetGermanDate(this.weekends)})`
+        this.weekNumberString = this.weekNumber.toString().padStart(2, "0")
 
     }
 
