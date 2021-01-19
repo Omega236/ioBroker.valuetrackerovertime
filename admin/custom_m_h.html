@@ -157,6 +157,13 @@
     <input type="checkbox" class="value" id="historyload_Detailed" data-field="historyload_Detailed" />
     <span class="translate">Analyze history data after saving this settings. Datapoints will be filled with history data ("Detailed history", "Detailed current", "Previous data" and "start values") <b>Experimental (data in the valuetrackerovertime would be override)</b></span>
   </div>
+  <div class="col s3 input-field onlyinCustom">
+    <input type="checkbox" class="value" id="historyload_writehistory" data-field="historyload_writehistory" />
+    <span class="translate">Analyze history data and fills history from the current datapoints</b></span>
+    <input placeholder="Leave empty to use the Readout instance" type="text" id="historyload_writehistory_instance" data-field="historyload_writehistory_instance" />
+			<span class="translate">the instance to save current history (history Settings must be enabled)</span>
+  </div>
+  
 </div>
 
 <style>

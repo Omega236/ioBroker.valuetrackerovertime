@@ -266,10 +266,12 @@ class valuetrackerovertime extends utils.Adapter {
 
 
                 //HistoryLoad
-                if (oS.historyload_Detailed) {
+                if (oS.historyload_Detailed || oS.historyload_writehistory) {
                     iobrokerObject.common.custom[this.namespace].historyload_Detailed = false;
+                    iobrokerObject.common.custom[this.namespace].historyload_writehistory = false;
                     await this.setForeignObjectAsync(oS.id, iobrokerObject);
-                    await this._readDetailedFromHistory_SQL(oS, oS.historyInstanz);
+
+                    await this._readDetailedFromHistory_SQL(oS);
                     return;
                 }
                 await this._publishCurrentValue(oS, new Date(), currentval);
@@ -720,6 +722,41 @@ class valuetrackerovertime extends utils.Adapter {
     }
 
     /**
+ * Creates the needed TreeStructure and returns the Id after alias-name
+ * @param {string} TimeFrame
+ * @param {Date} date
+ */
+    async _getTimeFrameBeginn(TimeFrame, date) {
+        const Checkdate = new Date(date);
+        Checkdate.setHours(0);
+        Checkdate.setMinutes(0);
+        Checkdate.setSeconds(0);
+        Checkdate.setMilliseconds(0);
+
+
+        if (TimeFrame == TimeFrames.Week) {
+            Checkdate.setDate(Checkdate.getDate() - (Checkdate.getDay() == 0 ? -6 : Checkdate.getDay() - 1))
+
+        }
+        if (TimeFrame == TimeFrames.Month) {
+            Checkdate.setDate(1);
+        }
+
+        if (TimeFrame == TimeFrames.Quarter) {
+            Checkdate.setMonth(Checkdate.getMonth() - (Checkdate.getMonth() % 3));
+            Checkdate.setDate(1);
+        }
+        if (TimeFrame == TimeFrames.Year) {
+            Checkdate.setMonth(0);
+            Checkdate.setDate(1);
+        }
+        return Checkdate
+
+
+
+    }
+
+    /**
     * Creates the needed TreeStructure and returns the Id after alias-name
     * @param {ObjectSettings} oS
     * @param {string} TimeFrame
@@ -847,17 +884,59 @@ class valuetrackerovertime extends utils.Adapter {
 
     }
 
+
+
+    async _writeCurrHistory(oS, ts, lastGoodValue, TimeFrame, hisstartvalues, mustWrite, lastwriteValues) {
+        if (oS.historyload_writehistory) {
+            let currentDP = await this._getObjectIDCurrent(TimeFrame)
+            let currentDPObject = await this._getObjectAsync(oS.alias + currentDP)
+
+            if (!lastwriteValues[oS.id])
+                lastwriteValues[oS.id] = {}
+            if (!lastwriteValues[oS.id][TimeFrame]) {
+                lastwriteValues[oS.id][TimeFrame] = -1000
+                const gethistory = await this.sendToAsync(oS.historyInstanz, 'deleteRange', [
+                    { id: currentDP, start: ts, end: (new Date().getTime()) }
+                ]);
+
+            }
+
+
+            if (currentDPObject && currentDPObject.common && currentDPObject.common.custom && currentDPObject.common.custom[oS.historyload_writehistory_instance] && currentDPObject.common.custom[oS.historyload_writehistory_instance].enabled) {
+                let aktive = true
+                let changesMinDelta = currentDPObject.common.custom[oS.historyload_writehistory_instance].changesMinDelta
+
+                let val = (lastGoodValue - hisstartvalues[TimeFrames.Day]) * oS.output_multiplier
+                if (mustWrite || Math.abs(val - lastwriteValues[oS.id][TimeFrame]) >= changesMinDelta) {
+                    let id = this.namespace + "." + oS.alias + currentDP
+                    const sethistory = await this.sendToAsync(oS.historyload_writehistory_instance, "storeState",
+                        {
+                            id: id,
+                            state: { val: val, ts: ts }
+                        });
+                    lastwriteValues[oS.id][TimeFrame] = val
+                        return 1
+
+                }
+
+
+
+
+            }
+        }
+        return 0
+    }
+
     /**
      * read DetailedData from History Instanz and save it in the Datastructure
      * @param {ObjectSettings} oS
-     * @param {string} historyInstanz
      */
-    async _readDetailedFromHistory_SQL(oS, historyInstanz) {
-        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Frage von " + historyInstanz + " die Daten der letzten 10 jahre ab (Wenn keine weiteren Logs, dann exisiter vielleicht die Instanz nicht oder ist deaktiviert)");
+    async _readDetailedFromHistory_SQL(oS) {
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Frage von " + oS.historyInstanz + " die Daten der letzten 10 jahre ab (Wenn keine weiteren Logs, dann exisiter vielleicht die Instanz nicht oder ist deaktiviert)");
         const end = Date.now();
         const start = end - 10 * 365 * 24 * 3600000;
 
-        const gethistory = await this.sendToAsync(historyInstanz, "getHistory", {
+        const gethistory = await this.sendToAsync(oS.historyInstanz, "getHistory", {
             id: oS.id,
             options: {
                 end: end,
@@ -888,6 +967,19 @@ class valuetrackerovertime extends utils.Adapter {
 
 
     }
+
+    /**
+     * Creates the needed TreeStructure and returns the Id after alias-name
+     * @param {ObjectSettings} oS
+     * @param {string} TimeFrame
+     * @param {Date} date
+     * @param {Number} TimeFrame_value
+     * */
+    async _CreateAndSetObjectIdDetailed2(oS, TimeFrame, date, TimeFrame_value) {
+        if (oS.historyload_Detailed)
+            await this._CreateAndSetObjectIdDetailed(oS, TimeFrame, date, TimeFrame_value)
+    }
+
     /**
      * Use the Data to Fill the Datastructure Detailed
      * @param {ObjectSettings} oS
@@ -895,6 +987,8 @@ class valuetrackerovertime extends utils.Adapter {
      */
     async _readDetailedFromHisory(oS, HistoryDataList) {
         this.log.info("HistoryAnalyseDetailed " + oS.id + ": Verarbeite " + HistoryDataList.length + " History Datensätze ");
+
+
 
         let DPfilled = 0;
         let resetsDetected = 0;
@@ -904,6 +998,9 @@ class valuetrackerovertime extends utils.Adapter {
         let counterResetDetetion_CurrentCountAfterReset = 0;
         let lastWrongValue = NaN;
 
+        let AnzahlHistoryWrite = 0
+
+        let lastwriteValues = {}
         const TimeFrameValueData = {};
         for (const TimeFrame in TimeFrames) {
             TimeFrameValueData[TimeFrame] = [];
@@ -928,9 +1025,14 @@ class valuetrackerovertime extends utils.Adapter {
                 while (myHis.date.getDate() > dateCheckIsOldTimeframe.getDate() || myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
                     await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Day]));
                     TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Day]) });
-                    hisstartvalues[TimeFrames.Day] = lastGoodValue;
-                    DPfilled++;
+
                     dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 1);
+                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime() -1, lastGoodValue, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
+                    hisstartvalues[TimeFrames.Day] = lastGoodValue;
+                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime(), lastGoodValue, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
+
+                    DPfilled++;
+
                 }
 
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
@@ -1016,34 +1118,39 @@ class valuetrackerovertime extends utils.Adapter {
 
                 }
 
+                AnzahlHistoryWrite += await this._writeCurrHistory(oS, myHis.date.getTime(), lastGoodValue, TimeFrames.Day, hisstartvalues, false, lastwriteValues)
+
+
             }
 
             LastHis = myHis;
 
         }
+        //before befüllen
+        if (oS.historyload_Detailed) {
+            for (const TimeFrame in TimeFrames) {
+                if (!(TimeFrame == TimeFrames.Minute || TimeFrame == TimeFrames.Hour)) {
+                    /** @type {Array<{date:Date, value:Number}>} */
+                    const MyTimeFrameData = TimeFrameValueData[TimeFrame];
+                    for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
+                        if (MyTimeFrameData.length >= zahler) {
+                            await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0));
+                        }
+                        else {
+                            //set no data yet
+                            await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data");
 
-        for (const TimeFrame in TimeFrames) {
-            if (!(TimeFrame == TimeFrames.Minute || TimeFrame == TimeFrames.Hour)) {
-                /** @type {Array<{date:Date, value:Number}>} */
-                const MyTimeFrameData = TimeFrameValueData[TimeFrame];
-                for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
-                    if (MyTimeFrameData.length >= zahler) {
-                        await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0));
+                        }
                     }
-                    else {
-                        //set no data yet
-                        await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data");
 
-                    }
+                    await this._setStartValue(oS, TimeFrame, hisstartvalues[TimeFrame]);
+
                 }
-
-                await this._setStartValue(oS, TimeFrame, hisstartvalues[TimeFrame]);
-
             }
         }
 
 
-        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + DPfilled + " Resets detected: " + resetsDetected);
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + DPfilled + " Resets detected: " + resetsDetected + " HistoryWrite: " + AnzahlHistoryWrite);
     }
 
 }

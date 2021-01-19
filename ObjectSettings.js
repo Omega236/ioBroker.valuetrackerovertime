@@ -18,7 +18,11 @@ class ObjectSettings {
         this.FirstWrongValue = Number.NaN;
         this.lastWrongValue = Number.NaN;
         this.counterResetDetetion_CurrentCountAfterReset = 0;
-        this.startValues = {}
+        this.startValues = {};
+        this.historyload_Detailed = Boolean(this.myCustomSettings.historyload_Detailed);
+        this.historyload_writehistory = Boolean(this.myCustomSettings.historyload_writehistory);
+        this.historyload_writehistory_instance = String(this.myCustomSettings.historyload_writehistory_instance);
+ 
     }
 
 
@@ -40,9 +44,8 @@ class ObjectSettings {
         return String(ret);
     }
 
-    get historyload_Detailed() {  return Boolean(this.myCustomSettings.historyload_Detailed); }
-    get historyInstanz() { return String( this.myCustomSettings.historyInstanz);}
-
+ get historyInstanz() { return String( this.myCustomSettings.historyInstanz);}
+    
 
 
     get id() { return this.iobrokerObject._id; }
