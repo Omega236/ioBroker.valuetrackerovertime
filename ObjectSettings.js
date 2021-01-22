@@ -21,6 +21,7 @@ class ObjectSettings {
         this.startValues = {};
         this.historyload_Detailed = Boolean(this.myCustomSettings.historyload_Detailed);
         this.historyload_writehistory = Boolean(this.myCustomSettings.historyload_writehistory);
+        this.historyload_writehistory = true
         this.historyload_writehistory_instance = String(this.myCustomSettings.historyload_writehistory_instance);
  
     }

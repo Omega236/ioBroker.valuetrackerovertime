@@ -269,7 +269,7 @@ class valuetrackerovertime extends utils.Adapter {
                 if (oS.historyload_Detailed || oS.historyload_writehistory) {
                     iobrokerObject.common.custom[this.namespace].historyload_Detailed = false;
                     iobrokerObject.common.custom[this.namespace].historyload_writehistory = false;
-                    await this.setForeignObjectAsync(oS.id, iobrokerObject);
+                    //await this.setForeignObjectAsync(oS.id, iobrokerObject);
 
                     await this._readDetailedFromHistory_SQL(oS);
                     return;
@@ -886,17 +886,15 @@ class valuetrackerovertime extends utils.Adapter {
 
 
 
-    async _writeCurrHistory(oS, ts, lastGoodValue, TimeFrame, hisstartvalues, mustWrite, lastwriteValues) {
+    async _writeCurrHistory(oS, ts, lastGoodhis, TimeFrame, hisstartvalues, mustWrite, lastwriteValues) {
         if (oS.historyload_writehistory) {
-            let currentDP = await this._getObjectIDCurrent(TimeFrame)
-            let currentDPObject = await this._getObjectAsync(oS.alias + currentDP)
+            let currentDP = oS.alias + await this._getObjectIDCurrent(TimeFrame)
+            let currentDPObject = await this._getObjectAsync(currentDP)
 
-            if (!lastwriteValues[oS.id])
-                lastwriteValues[oS.id] = {}
-            if (!lastwriteValues[oS.id][TimeFrame]) {
-                lastwriteValues[oS.id][TimeFrame] = -1000
+            if (!lastwriteValues[TimeFrame]) {
+                lastwriteValues[TimeFrame] = -1000
                 const gethistory = await this.sendToAsync(oS.historyInstanz, 'deleteRange', [
-                    { id: currentDP, start: ts, end: (new Date().getTime()) }
+                    { id: this.namespace + "." + currentDP, start: ts, end: (new Date().getTime()) }
                 ]);
 
             }
@@ -906,16 +904,19 @@ class valuetrackerovertime extends utils.Adapter {
                 let aktive = true
                 let changesMinDelta = currentDPObject.common.custom[oS.historyload_writehistory_instance].changesMinDelta
 
-                let val = (lastGoodValue - hisstartvalues[TimeFrames.Day]) * oS.output_multiplier
-                if (mustWrite || Math.abs(val - lastwriteValues[oS.id][TimeFrame]) >= changesMinDelta) {
-                    let id = this.namespace + "." + oS.alias + currentDP
+                let val = (lastGoodhis.val - hisstartvalues[TimeFrames.Day]) * oS.output_multiplier
+                if (mustWrite || Math.abs(val - lastwriteValues[TimeFrame]) >= changesMinDelta) {
+                    let id = this.namespace + "." + currentDP
+
                     const sethistory = await this.sendToAsync(oS.historyload_writehistory_instance, "storeState",
                         {
                             id: id,
                             state: { val: val, ts: ts }
                         });
-                    lastwriteValues[oS.id][TimeFrame] = val
-                        return 1
+                    const waitforDB = await this.sendToAsync('sql.0', 'query', 'SELECT NOW()');
+
+                    lastwriteValues[TimeFrame] = val
+                    return 1
 
                 }
 
@@ -993,10 +994,10 @@ class valuetrackerovertime extends utils.Adapter {
         let DPfilled = 0;
         let resetsDetected = 0;
         const hisstartvalues = {};
-        let lastGoodValue = 0;
-        let FirstWrongValue = NaN;
+        let lastGoodhis = null;
+        let FirstWronghis = null;
         let counterResetDetetion_CurrentCountAfterReset = 0;
-        let lastWrongValue = NaN;
+        let lastWronghis = null;
 
         let AnzahlHistoryWrite = 0
 
@@ -1009,11 +1010,11 @@ class valuetrackerovertime extends utils.Adapter {
         let LastHis;
         for (const zahler in HistoryDataList) {
             const myHis = HistoryDataList[zahler];
-            if (!LastHis) {
+            if (!LastHis || !lastGoodhis) {
 
-                lastGoodValue = myHis.hisval;
+                lastGoodhis = myHis;
                 for (const TimeFrame in TimeFrames) {
-                    hisstartvalues[TimeFrame] = myHis.hisval;
+                    hisstartvalues[TimeFrame] = myHis.val;
 
 
                 }
@@ -1023,13 +1024,13 @@ class valuetrackerovertime extends utils.Adapter {
                 let dateCheckIsOldTimeframe = new Date(LastHis.date);
 
                 while (myHis.date.getDate() > dateCheckIsOldTimeframe.getDate() || myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Day]));
-                    TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Day]) });
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Day, dateCheckIsOldTimeframe, (lastGoodhis.val - hisstartvalues[TimeFrames.Day]));
+                    TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodhis.val - hisstartvalues[TimeFrames.Day]) });
 
                     dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 1);
-                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime() -1, lastGoodValue, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
-                    hisstartvalues[TimeFrames.Day] = lastGoodValue;
-                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime(), lastGoodValue, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
+                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime() - 1, lastGoodhis, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
+                    hisstartvalues[TimeFrames.Day] = lastGoodhis.val;
+                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime(), lastGoodhis, TimeFrames.Day, hisstartvalues, true, lastwriteValues)
 
                     DPfilled++;
 
@@ -1040,10 +1041,10 @@ class valuetrackerovertime extends utils.Adapter {
                 let dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
                 const myHisKWInfo = new KWInfo(myHis.date);
                 while (myHisKWInfo.weekNumber > dateCheckIsOldTimeframe_KWInfo.weekNumber || myHisKWInfo.yearOfThursday > dateCheckIsOldTimeframe_KWInfo.yearOfThursday) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Week]));
-                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Week]) });
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, dateCheckIsOldTimeframe, (lastGoodhis.val - hisstartvalues[TimeFrames.Week]));
+                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodhis.val - hisstartvalues[TimeFrames.Week]) });
 
-                    hisstartvalues[TimeFrames.Week] = lastGoodValue;
+                    hisstartvalues[TimeFrames.Week] = lastGoodhis.val;
                     DPfilled++;
                     dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 7);
                     dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
@@ -1052,10 +1053,10 @@ class valuetrackerovertime extends utils.Adapter {
 
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Month]));
-                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Month]) });
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, dateCheckIsOldTimeframe, (lastGoodhis.val - hisstartvalues[TimeFrames.Month]));
+                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodhis.val - hisstartvalues[TimeFrames.Month]) });
 
-                    hisstartvalues[TimeFrames.Month] = lastGoodValue;
+                    hisstartvalues[TimeFrames.Month] = lastGoodhis.val;
 
                     DPfilled++;
                     dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 1);
@@ -1063,47 +1064,47 @@ class valuetrackerovertime extends utils.Adapter {
 
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (Math.floor(myHis.date.getMonth() / 3) > Math.floor(dateCheckIsOldTimeframe.getMonth() / 3) || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Quarter]));
-                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Quarter]) });
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, dateCheckIsOldTimeframe, (lastGoodhis.val - hisstartvalues[TimeFrames.Quarter]));
+                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodhis.val - hisstartvalues[TimeFrames.Quarter]) });
 
-                    hisstartvalues[TimeFrames.Quarter] = lastGoodValue;
+                    hisstartvalues[TimeFrames.Quarter] = lastGoodhis.val;
                     dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 3);
                     DPfilled++;
                 }
 
                 dateCheckIsOldTimeframe = new Date(LastHis.date);
                 while (myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, dateCheckIsOldTimeframe, (lastGoodValue - hisstartvalues[TimeFrames.Year]));
-                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodValue - hisstartvalues[TimeFrames.Year]) });
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, dateCheckIsOldTimeframe, (lastGoodhis.val - hisstartvalues[TimeFrames.Year]));
+                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (lastGoodhis.val - hisstartvalues[TimeFrames.Year]) });
 
-                    hisstartvalues[TimeFrames.Year] = lastGoodValue;
+                    hisstartvalues[TimeFrames.Year] = lastGoodhis.val;
                     DPfilled++;
                     dateCheckIsOldTimeframe.setFullYear(dateCheckIsOldTimeframe.getFullYear() + 1);
                 }
 
 
                 //Reset detection
-                if (oS.counterResetDetection && myHis.hisval < lastGoodValue) {
+                if (oS.counterResetDetection && myHis.val < lastGoodhis.val) {
                     //Verringerung erkannt -> neuanpassung der startWerte
-                    if (Number.isNaN(FirstWrongValue)) {
-                        FirstWrongValue = myHis.hisval;
+                    if (FirstWronghis == null) {
+                        FirstWronghis = myHis;
                         counterResetDetetion_CurrentCountAfterReset = 0;
-                        lastWrongValue = NaN;
+                        lastWronghis = null;
                     }
-                    if (lastWrongValue != myHis.hisval) {
+                    if (lastWronghis == null || lastWronghis.val != myHis.val) {
                         counterResetDetetion_CurrentCountAfterReset += 1;
-                        lastWrongValue = myHis.hisval;
+                        lastWronghis = myHis;
                     }
                     if (counterResetDetetion_CurrentCountAfterReset <= oS.counterResetDetetion_CountAfterReset) {
                         //return;
                     }
                     else {
-                        const theAnpassung = lastGoodValue - FirstWrongValue;
+                        const theAnpassung = lastGoodhis.val - FirstWronghis.val;
 
 
-                        this.log.warn("HistoryAnalyseDetailed " + oS.id + ": Counter wurde scheinbar resetet! Reset von " + lastGoodValue + " nach " + FirstWrongValue + " passe alle Startwerte an");
-                        lastGoodValue = myHis.hisval;
-                        FirstWrongValue = NaN;
+                        this.log.warn("HistoryAnalyseDetailed " + oS.id + ": Counter wurde scheinbar resetet! Reset von " + lastGoodhis.val + " nach " + FirstWronghis.val + ", passe alle Startwerte an");
+                        lastGoodhis = myHis;
+                        FirstWronghis = null;
                         resetsDetected++;
                         for (const TimeFrame in TimeFrames) {
                             hisstartvalues[TimeFrame] = hisstartvalues[TimeFrame] - theAnpassung;
@@ -1113,15 +1114,18 @@ class valuetrackerovertime extends utils.Adapter {
 
                 }
                 else {
-                    FirstWrongValue = NaN;
-                    lastGoodValue = myHis.hisval;
+                    FirstWronghis = null;
+                    lastGoodhis = myHis;
+
+                }
+                if (lastGoodhis === myHis) {
+                    AnzahlHistoryWrite += await this._writeCurrHistory(oS, myHis.date.getTime(), lastGoodhis, TimeFrames.Day, hisstartvalues, false, lastwriteValues)
 
                 }
 
-                AnzahlHistoryWrite += await this._writeCurrHistory(oS, myHis.date.getTime(), lastGoodValue, TimeFrames.Day, hisstartvalues, false, lastwriteValues)
-
 
             }
+
 
             LastHis = myHis;
 

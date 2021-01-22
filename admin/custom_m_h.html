@@ -49,7 +49,8 @@
 </div>
 <p class=" translate title">Detailed current</p>
 <div class="row">
-    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)</span>
+    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or
+        PowerUsageInDecember)</span>
 </div>
 <div class="row">
     <div class="col  input-field mytooltip">
@@ -89,7 +90,8 @@
 <p class=" translate title">Current / previous data</p>
 <div class="row">
     <div class="col mytooltip">
-        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
+        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes
+            before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
         <span class="mytooltiptext">
             <span>example before >= 0: </span>
             <img src="/adapter/valuetrackerovertime/VTOT_Setting_Current.PNG" />
@@ -149,21 +151,50 @@
 </div>
 <p class=" translate title">History readut (Experimental)</p>
 <div class="row">
-  <div class="col s3 input-field">
-    <input type="text" class="value" id="historyInstanz" data-field="historyInstanz" />
-    <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x or history.x</span>
-  </div>
-  <div class="col s3 input-field onlyinCustom">
-    <input type="checkbox" class="value" id="historyload_Detailed" data-field="historyload_Detailed" />
-    <span class="translate">Analyze history data after saving this settings. Datapoints will be filled with history data ("Detailed history", "Detailed current", "Previous data" and "start values") <b>Experimental (data in the valuetrackerovertime would be override)</b></span>
-  </div>
-  <div class="col s3 input-field onlyinCustom">
-    <input type="checkbox" class="value" id="historyload_writehistory" data-field="historyload_writehistory" />
-    <span class="translate">Analyze history data and fills history from the current datapoints</b></span>
-    <input placeholder="Leave empty to use the Readout instance" type="text" id="historyload_writehistory_instance" data-field="historyload_writehistory_instance" />
-			<span class="translate">the instance to save current history (history Settings must be enabled)</span>
-  </div>
-  
+    <div class="col s3 input-field ">
+        <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
+        <span class="translate">Do now History Analyze</b></span>
+        <input type="text" class="value onlyinCustom" id="historyInstanz" data-field="historyInstanz" />
+        <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
+            or history.x</span>
+    </div>
+    <div class="col s3 input-field">
+        <input type="checkbox" class="value" id="history_detailed" data-field="history_detailed" />
+        <span class="translate">history_detailed</b></span>
+        <input type="checkbox" class="value" id="history_before" data-field="history_before" />
+        <span class="translate">history_before</b></span>
+        <input type="checkbox" class="value" id="history_startvalues" data-field="history_startvalues" />
+        <span class="translate">history_startvalues</b></span>
+    </div>
+    <div class="col s3 input-field">
+        <input placeholder="Leave empty to use the history Read Instanz" type="text" id="historywrite_Instanz"
+            data-field="history_writeInstanz" />
+        <span class="translate">history_writeInstanz</span>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">historywrite_Enabled_Day</b></span>
+        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">historywrite_MinChange_Day</span>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">historywrite_Enabled_Day</b></span>
+        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">historywrite_MinChange_Day</span>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">historywrite_Enabled_Day</b></span>
+        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">historywrite_MinChange_Day</span>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">historywrite_Enabled_Day</b></span>
+        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">historywrite_MinChange_Day</span>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">historywrite_Enabled_Day</b></span>
+        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">historywrite_MinChange_Day</span>
+
+        <input type="checkbox" class="value" id="historywrite_M" data-field="historyload_writehistory" />
+        <span class="translate">Analyze history data and fills history from the current datapoints</b></span>
+    </div>
+
 </div>
 
 <style>
@@ -191,6 +222,6 @@
 
     .mytooltip:hover .mytooltiptext {
         visibility: visible;
-        transition-delay:0.3s;
+        transition-delay: 0.3s;
     }
 </style>

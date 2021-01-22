@@ -73,7 +73,8 @@
 </div>
 <p class=" translate title">Detailed current</p>
 <div class="row">
-    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)</span>
+    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or
+        PowerUsageInDecember)</span>
 </div>
 <div class="row">
     <div class="col  input-field mytooltip">
@@ -113,7 +114,8 @@
 <p class=" translate title">Current / previous data</p>
 <div class="row">
     <div class="col mytooltip">
-        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
+        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes
+            before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
         <span class="mytooltiptext">
             <span>example before >= 0: </span>
             <img src="/adapter/valuetrackerovertime/VTOT_Setting_Current.PNG" />
@@ -171,23 +173,71 @@
     </div>
 
 </div>
-<p class=" translate title">History readut (Experimental)</p>
-<div class="row">
-  <div class="col s3 input-field">
-    <input type="text" class="value" id="historyInstanz" data-field="historyInstanz" />
-    <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x or history.x</span>
-  </div>
-  <div class="col s3 input-field onlyinCustom">
-    <input type="checkbox" class="value" id="historyload_Detailed" data-field="historyload_Detailed" />
-    <span class="translate">Analyze history data after saving this settings. Datapoints will be filled with history data ("Detailed history", "Detailed current", "Previous data" and "start values") <b>Experimental (data in the valuetrackerovertime would be override)</b></span>
-  </div>
-  <div class="col s3 input-field onlyinCustom">
-    <input type="checkbox" class="value" id="historyload_writehistory" data-field="historyload_writehistory" />
-    <span class="translate">Analyze history data and fills history to the current datapoints</b></span>
-    <input placeholder="Leave empty to use the Readout instance" type="text" id="historyload_writehistory_instance" data-field="historyload_writehistory_instance" />
-    <span class="translate">the instance to save current history (history Settings must be enabled)</span>
 
-  </div>
+<p class=" translate title">History readout (Experimental)</p>
+
+<div class="row">
+    <div class="col s4 input-field ">
+        <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
+        <span class="translate">readout history no</b></span>
+        <input type="text" class="value onlyinCustom" id="historyInstanz" data-field="historyInstanz" />
+        <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
+            or history.x</span>
+    </div>
+    <div class="col s2 input-field">
+        <input type="checkbox" class="value" id="history_detailed" data-field="history_detailed" />
+        <span class="translate">readout detailed</b></span>
+        <br>
+        <input type="checkbox" class="value" id="history_before" data-field="history_before" />
+        <span class="translate">readout before</b></span>
+        <br>
+        <input type="checkbox" class="value" id="history_startvalues" data-field="history_startvalues" />
+        <span class="translate">readout startvalues</b></span>
+    </div>
+    <div class="col s2 input-field">
+        <input placeholder="Leave empty to use the history Read Instanz" type="text" id="historywrite_Instanz"
+            data-field="history_writeInstanz" />
+        <span class="translate">history_writeInstanz</span>
+        
+    </div>
+    <div class="col s4 input-field">
+       <row>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+        <span class="translate">fill 01_current_Day history</span>
+
+        <input type="number" class="value" style="width:100px" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+        <span class="translate">Min Delta</span>
+       </row>     
+       <row>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Week" data-field="historywrite_Enabled_Week" />
+        <span class="translate">fill 02_current_Week history</span>
+
+        <input type="number" class="value" style="width:100px" id="historywrite_MinChange_Week" data-field="historywrite_MinChange_Week" />
+        <span class="translate">Min Delta</span>
+       </row> 
+       <row>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Month" data-field="historywrite_Enabled_Month" />
+        <span class="translate">fill 03_current_Month history</span>
+
+        <input type="number" class="value" style="width:100px" id="historywrite_MinChange_Month" data-field="historywrite_MinChange_Month" />
+        <span class="translate">Min Delta</span>
+       </row> 
+       <row>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Quarter" data-field="historywrite_Enabled_Quarter" />
+        <span class="translate">fill 04_current_Quarter history</span>
+
+        <input type="number" class="value" style="width:100px" id="historywrite_MinChange_Quarter" data-field="historywrite_MinChange_Quarter" />
+        <span class="translate">Min Delta</span>
+       </row> 
+       <row>
+        <input type="checkbox" class="value" id="historywrite_Enabled_Year" data-field="historywrite_Enabled_Year" />
+        <span class="translate">fill 05_current_Year history</span>
+
+        <input type="number" class="value" style="width:100px;text-align:right;" id="historywrite_MinChange_Year" data-field="historywrite_MinChange_Year" />
+        <span class="translate">Min Delta</span>
+       </row> 
+    </div>
+
 </div>
 
 <style>
@@ -215,7 +265,7 @@
 
     .mytooltip:hover .mytooltiptext {
         visibility: visible;
-        transition-delay:0.3s;
+        transition-delay: 0.3s;
     }
 </style>
 
@@ -264,7 +314,8 @@
         counterResetDetection: instanceObj.native.counterResetDetection,
         counterResetDetetion_CountAfterReset: instanceObj.native.counterResetDetetion_CountAfterReset,
         historyInstanz: instanceObj.native.historyInstanz,
-        historyload_Detailed: false
+        historyload_Detailed: false,
+        historywrite_MinChange_Year: 3
 
 
       };
