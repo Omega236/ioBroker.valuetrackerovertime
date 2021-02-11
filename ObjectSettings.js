@@ -19,13 +19,22 @@ class ObjectSettings {
         this.lastWrongValue = Number.NaN;
         this.counterResetDetetion_CurrentCountAfterReset = 0;
         this.startValues = {};
-        this.historyload_Detailed = Boolean(this.myCustomSettings.historyload_Detailed);
-        this.historyload_writehistory = Boolean(this.myCustomSettings.historyload_writehistory);
-        this.historyload_writehistory = true
-        this.historyload_writehistory_instance = String(this.myCustomSettings.historyload_writehistory_instance);
- 
+
+
+        this.history_work = Boolean(this.myCustomSettings.history_work)
+        this.history_Instanz = String(this.myCustomSettings.history_Instanz)
+        this.history_detailed = Boolean(this.myCustomSettings.history_detailed)
+        this.history_before = Boolean(this.myCustomSettings.history_before)
+        this.history_startvalues = Boolean(this.myCustomSettings.history_startvalues)
+        this.historywrite_Instanz = String(this.myCustomSettings.historywrite_Instanz)
     }
 
+    historywrite_Enabled(TimeFrame) {
+        return Boolean(this.myCustomSettings["historywrite_Enabled_" + TimeFrame])
+    }
+    historywrite_MinChange(TimeFrame) {
+        return Boolean(this.myCustomSettings["historywrite_MinChange_" + TimeFrame])
+    }
 
 
 
@@ -45,8 +54,8 @@ class ObjectSettings {
         return String(ret);
     }
 
- get historyInstanz() { return String( this.myCustomSettings.historyInstanz);}
-    
+    get historyInstanz() { return String(this.myCustomSettings.historyInstanz); }
+
 
 
     get id() { return this.iobrokerObject._id; }
@@ -76,25 +85,25 @@ class ObjectSettings {
         if (TimeFrame == "Minute" || TimeFrame == "Hour")
             return false;
 
-        let asd = "detailed_" + TimeFrame.toLowerCase() + "s"  
-        let ret =  this.myCustomSettings[asd];
+        let asd = "detailed_" + TimeFrame.toLowerCase() + "s"
+        let ret = this.myCustomSettings[asd];
         return ret;
 
     }
-     /**
-  * returns the
-  * @param {string} TimeFrame
+    /**
+ * returns the
+ * @param {string} TimeFrame
 * @returns {boolean}
-  */
- detailed_current(TimeFrame) {
-    if (TimeFrame == "Minute" || TimeFrame == "Hour")
-        return false;
+ */
+    detailed_current(TimeFrame) {
+        if (TimeFrame == "Minute" || TimeFrame == "Hour")
+            return false;
 
-    let asd = "detailed_" +  "current_" + TimeFrame.toLowerCase() + "s"  
-    let ret =  this.myCustomSettings[asd];
-    return ret;
+        let asd = "detailed_" + "current_" + TimeFrame.toLowerCase() + "s"
+        let ret = this.myCustomSettings[asd];
+        return ret;
 
-}
+    }
 
     /**
   * returns the Count of Current/Previous Datapoints

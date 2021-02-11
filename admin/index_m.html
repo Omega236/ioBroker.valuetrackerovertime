@@ -11,9 +11,32 @@
     <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
     <script type="text/javascript" src="../../lib/js/jquery.fancytree-all.min.js"></script>
     <script>
+
         $(function () {
-            $("#Platzhalter").load("custom_m_h.html");
+            $("#Platzhalter").load("custom_m_h.html", function () {
+
+                var coll = document.getElementsByClassName("collapsiblex");
+                var i;
+
+                for (i = 0; i < coll.length; i++) {
+                    coll[i].addEventListener("click", function () {
+                        this.classList.toggle("active");
+                        var content = this.nextElementSibling;
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        }
+                    });
+                }
+            });
+
         });
+        // Shorthand for $( document ).ready()
+        $(function () {
+
+        });
+
     </script>
     <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 

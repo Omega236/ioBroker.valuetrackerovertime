@@ -149,53 +149,75 @@
     </div>
 
 </div>
-<p class=" translate title">History readut (Experimental)</p>
-<div class="row">
-    <div class="col s3 input-field ">
-        <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
-        <span class="translate">Do now History Analyze</b></span>
-        <input type="text" class="value onlyinCustom" id="historyInstanz" data-field="historyInstanz" />
-        <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
-            or history.x</span>
-    </div>
-    <div class="col s3 input-field">
-        <input type="checkbox" class="value" id="history_detailed" data-field="history_detailed" />
-        <span class="translate">history_detailed</b></span>
-        <input type="checkbox" class="value" id="history_before" data-field="history_before" />
-        <span class="translate">history_before</b></span>
-        <input type="checkbox" class="value" id="history_startvalues" data-field="history_startvalues" />
-        <span class="translate">history_startvalues</b></span>
-    </div>
-    <div class="col s3 input-field">
-        <input placeholder="Leave empty to use the history Read Instanz" type="text" id="historywrite_Instanz"
-            data-field="history_writeInstanz" />
-        <span class="translate">history_writeInstanz</span>
-        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
-        <span class="translate">historywrite_Enabled_Day</b></span>
-        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
-        <span class="translate">historywrite_MinChange_Day</span>
-        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
-        <span class="translate">historywrite_Enabled_Day</b></span>
-        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
-        <span class="translate">historywrite_MinChange_Day</span>
-        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
-        <span class="translate">historywrite_Enabled_Day</b></span>
-        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
-        <span class="translate">historywrite_MinChange_Day</span>
-        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
-        <span class="translate">historywrite_Enabled_Day</b></span>
-        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
-        <span class="translate">historywrite_MinChange_Day</span>
-        <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
-        <span class="translate">historywrite_Enabled_Day</b></span>
-        <input type="number" class="value" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
-        <span class="translate">historywrite_MinChange_Day</span>
 
-        <input type="checkbox" class="value" id="historywrite_M" data-field="historyload_writehistory" />
-        <span class="translate">Analyze history data and fills history from the current datapoints</b></span>
-    </div>
 
+
+<button type="button" class="translate title collapsiblex">History readout (Experimental)</button>
+<div class="contentx">
+    <div class="row">
+
+        <div class="col s3 input-field ">
+            <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
+            <span class="translate onlyinCustom">readout now</span>
+            <input type="text" class="value " id="historyInstanz" data-field="historyInstanz" />
+            <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
+                or history.x</span>
+        </div>
+        <div class="col s3 input-field">
+            <p>
+                <input type="checkbox" class="value" id="history_detailed" data-field="history_detailed" />
+                <span class="translate">fill detailed</b></span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_before" data-field="history_before" />
+                <span class="translate">fill befores</b></span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_startvalues" data-field="history_startvalues" />
+                <span class="translate">fill startvalues</b></span>
+            </p>
+        </div>
+        <div class="col s6 input-field">
+            <p class="translate title">fill History</p>
+            <p>
+                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value" id="historywrite_Instanz"
+                data-field="historywrite_Instanz" />
+                <span class="translate">historywrite_Instanz</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+                <span class="translate">01_current_Day</span>
+                <input type="number" class="value minDelta" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="historywrite_Enabled_Week" data-field="historywrite_Enabled_Week" />
+                <span class="translate">02_current_Week</span>
+                <input type="number" class="value minDelta" id="historywrite_MinChange_Week" data-field="historywrite_MinChange_Week" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="historywrite_Enabled_Month" data-field="historywrite_Enabled_Month" />
+                <span class="translate">03_current_Month</span>
+                <input type="number" class="value minDelta" id="historywrite_MinChange_Month" data-field="historywrite_MinChange_Month" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="historywrite_Enabled_Quarter" data-field="historywrite_Enabled_Quarter" />
+                <span class="translate">04_current_Quarter</span>
+                <input type="number" class="value minDelta" id="historywrite_MinChange_Quarter" data-field="historywrite_MinChange_Quarter" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="historywrite_Enabled_Year" data-field="historywrite_Enabled_Year" />
+                <span class="translate">05_current_Year</span>
+                <input type="number" class="value minDelta"  id="historywrite_MinChange_Year" data-field="historywrite_MinChange_Year" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+        </div>
+    </div>
 </div>
+
 
 <style>
     .mytooltip {
@@ -224,4 +246,29 @@
         visibility: visible;
         transition-delay: 0.3s;
     }
+
+    .minDelta {
+        width:70px !important;
+        text-align: right;
+    }
+
+    /* Style the button that is used to open and close the collapsible content */
+    .collapsiblex {
+      cursor: pointer;
+      width: calc(100% - 20px);
+      text-align: left;
+      outline: none;
+    }
+   
+   
+    /* Style the collapsible content. Note: hidden by default */
+    .contentx {
+      margin-right: 20px;
+      margin-bottom: 40px;
+      padding: 0 18px;
+      overflow: hidden;
+      background-color: #e1e1e1;
+      max-height:0;
+      transition: max-height 0.2s ease-out;
+    } 
 </style>
