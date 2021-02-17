@@ -571,22 +571,7 @@ class valuetrackerovertime extends utils.Adapter {
      */
     async _getDateTimeInfoForPrevious(TimeFrame, theDate, beforeZähler) {
 
-        const newdate = new Date(theDate);
-        if (TimeFrame == TimeFrames.Minute) {
-            newdate.setMinutes(newdate.getMinutes() - beforeZähler);
-        } else if (TimeFrame == TimeFrames.Hour) {
-            newdate.setHours(newdate.getHours() - beforeZähler);
-        } else if (TimeFrame == TimeFrames.Day) {
-            newdate.setDate(newdate.getDate() - beforeZähler);
-        } else if (TimeFrame == TimeFrames.Week) {
-            newdate.setDate(newdate.getDate() - 7 * beforeZähler);
-        } else if (TimeFrame == TimeFrames.Month) {
-            newdate.setMonth(newdate.getMonth() - beforeZähler);
-        } else if (TimeFrame == TimeFrames.Quarter) {
-            newdate.setMonth(newdate.getMonth() - (beforeZähler * 3));
-        } else if (TimeFrame == TimeFrames.Year) {
-            newdate.setFullYear(newdate.getFullYear() - beforeZähler);
-        }
+        const newdate = await this.addOneTimeFrame(TimeFrame, theDate, beforeZähler * -1);
         return await this._getTimeFrameInfo(TimeFrame, newdate);
     }
 
@@ -727,28 +712,36 @@ class valuetrackerovertime extends utils.Adapter {
  */
     async _getTimeFrameBeginn(TimeFrame, date) {
         const Checkdate = new Date(date);
-        Checkdate.setHours(0);
-        Checkdate.setMinutes(0);
-        Checkdate.setSeconds(0);
         Checkdate.setMilliseconds(0);
+        Checkdate.setSeconds(0);
 
-
+        if (TimeFrame == TimeFrames.Minute) {
+            return Checkdate
+        }
+        Checkdate.setMinutes(0);
+        if (TimeFrame == TimeFrames.Hour) {
+            return Checkdate
+        }
+        Checkdate.setHours(0);
+        if (TimeFrame == TimeFrames.Day) {
+            return Checkdate
+        }
         if (TimeFrame == TimeFrames.Week) {
             Checkdate.setDate(Checkdate.getDate() - (Checkdate.getDay() == 0 ? -6 : Checkdate.getDay() - 1))
-
+            return Checkdate
         }
+        Checkdate.setDate(1);
+
         if (TimeFrame == TimeFrames.Month) {
-            Checkdate.setDate(1);
+            return Checkdate
         }
 
         if (TimeFrame == TimeFrames.Quarter) {
+
             Checkdate.setMonth(Checkdate.getMonth() - (Checkdate.getMonth() % 3));
-            Checkdate.setDate(1);
+            return Checkdate
         }
-        if (TimeFrame == TimeFrames.Year) {
-            Checkdate.setMonth(0);
-            Checkdate.setDate(1);
-        }
+        Checkdate.setMonth(0);
         return Checkdate
 
 
@@ -764,16 +757,15 @@ class valuetrackerovertime extends utils.Adapter {
     async _CreateAndGetObjectIdDetailedCurrent(oS, TimeFrame, date) {
         if (oS.detailed_current(TimeFrame)) {
             let mydetailedObjectId = "";
-            const Checkdate = new Date();
-            Checkdate.setHours(24);
-            Checkdate.setMinutes(0);
+            let Checkdate2 = await this._getTimeFrameBeginn(TimeFrame, new Date())
+            Checkdate2 = await this.addOneTimeFrame(TimeFrame, Checkdate2,  1 )
 
             if (TimeFrame != TimeFrames.Year) {
                 mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
                 await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
                 if (TimeFrame == TimeFrames.Day) {
-                    Checkdate.setDate(Checkdate.getDate() - 7);
-                    if (date >= Checkdate) {
+                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Day, Checkdate2, -7  )
+                    if (date >= Checkdate2) {
                         let myDayNumber = date.getDay();
                         if (myDayNumber == 0)
                             myDayNumber = 7;
@@ -783,9 +775,10 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Week) {
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
+                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
 
-                    if (date >= Checkdate) {
+
+                    if (date >= Checkdate2) {
                         {
                             mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Week, date);
                             await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Week, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -795,10 +788,8 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Month) {
-                    Checkdate.setMonth(Checkdate.getMonth() + 1);
-                    Checkdate.setDate(1);
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
-                    if (date >= Checkdate) {
+                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
+                    if (date >= Checkdate2) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Month, date);
                         await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Month, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -807,10 +798,8 @@ class valuetrackerovertime extends utils.Adapter {
                 }
 
                 if (TimeFrame == TimeFrames.Quarter) {
-                    Checkdate.setMonth(Checkdate.getMonth() + 3 - (Checkdate.getMonth() % 3));
-                    Checkdate.setDate(1);
-                    Checkdate.setFullYear(Checkdate.getFullYear() - 1);
-                    if (date >= Checkdate) {
+                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
+                    if (date >= Checkdate2) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Quarter, date);
                         await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Quarter, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -1012,16 +1001,25 @@ class valuetrackerovertime extends utils.Adapter {
 
     }
 
-    async addOneTimeFrame(TimeFrame, theDate) {
-        let ret = new Date(theDate)
-        if (TimeFrame == TimeFrames.Day){
-            ret.setDate(ret.getDate() + 1);
-        }
-        if (TimeFrame == TimeFrames.Week){
-            ret.setDate(ret.getDate() + 7);
-        }
-        return ret
 
+    async addOneTimeFrame(TimeFrame, theDate, numberofChange) {
+        const newdate = new Date(theDate);
+        if (TimeFrame == TimeFrames.Minute) {
+            newdate.setMinutes(newdate.getMinutes() + numberofChange);
+        } else if (TimeFrame == TimeFrames.Hour) {
+            newdate.setHours(newdate.getHours() + numberofChange);
+        } else if (TimeFrame == TimeFrames.Day) {
+            newdate.setDate(newdate.getDate() + numberofChange);
+        } else if (TimeFrame == TimeFrames.Week) {
+            newdate.setDate(newdate.getDate() + (7 * numberofChange));
+        } else if (TimeFrame == TimeFrames.Month) {
+            newdate.setMonth(newdate.getMonth() + numberofChange);
+        } else if (TimeFrame == TimeFrames.Quarter) {
+            newdate.setMonth(newdate.getMonth() + (numberofChange * 3));
+        } else if (TimeFrame == TimeFrames.Year) {
+            newdate.setFullYear(newdate.getFullYear() - numberofChange);
+        }
+        return newdate
     }
 
     /**
