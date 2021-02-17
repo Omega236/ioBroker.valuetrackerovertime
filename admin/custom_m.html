@@ -183,59 +183,59 @@
         <div class="col s3 input-field ">
             <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
             <span class="translate onlyinCustom">readout now</span>
-            <input type="text" class="value " id="historyInstanz" data-field="historyInstanz" />
+            <input type="text" class="value " id="history_Instanz" data-field="history_Instanz" />
             <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
                 or history.x</span>
         </div>
         <div class="col s3 input-field">
             <p>
-                <input type="checkbox" class="value" id="history_detailed" data-field="history_detailed" />
+                <input type="checkbox" class="value" id="history_fill_detailed" data-field="history_fill_detailed" />
                 <span class="translate">fill detailed</b></span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_before" data-field="history_before" />
+                <input type="checkbox" class="value" id="history_fill_before" data-field="history_fill_before" />
                 <span class="translate">fill befores</b></span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_startvalues" data-field="history_startvalues" />
+                <input type="checkbox" class="value" id="history_fill_startvalues" data-field="history_fill_startvalues" />
                 <span class="translate">fill startvalues</b></span>
             </p>
         </div>
         <div class="col s6 input-field">
             <p class="translate title">fill History</p>
             <p>
-                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value" id="historywrite_Instanz"
-                data-field="historywrite_Instanz" />
+                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value" id="history_fill_history_Instanz"
+                data-field="history_fill_history_Instanz" />
                 <span class="translate">historywrite_Instanz</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="historywrite_Enabled_Day" data-field="historywrite_Enabled_Day" />
+                <input type="checkbox" class="value" id="history_fill_history_Day_enabled" data-field="history_fill_history_Day_enabled" />
                 <span class="translate">01_current_Day</span>
-                <input type="number" class="value minDelta" id="historywrite_MinChange_Day" data-field="historywrite_MinChange_Day" />
+                <input type="number" class="value minDelta" id="history_fill_history_Day_MinChange" data-field="history_fill_history_Day_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="historywrite_Enabled_Week" data-field="historywrite_Enabled_Week" />
+                <input type="checkbox" class="value" id="history_fill_history_Week_enabled" data-field="history_fill_history_Week_enabled" />
                 <span class="translate">02_current_Week</span>
-                <input type="number" class="value minDelta" id="historywrite_MinChange_Week" data-field="historywrite_MinChange_Week" />
+                <input type="number" class="value minDelta" id="history_fill_history_Week_MinChange" data-field="history_fill_history_Week_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="historywrite_Enabled_Month" data-field="historywrite_Enabled_Month" />
+                <input type="checkbox" class="value" id="history_fill_history_Month_enabled" data-field="history_fill_history_Month_enabled" />
                 <span class="translate">03_current_Month</span>
-                <input type="number" class="value minDelta" id="historywrite_MinChange_Month" data-field="historywrite_MinChange_Month" />
+                <input type="number" class="value minDelta" id="history_fill_history_Month_MinChange" data-field="history_fill_history_Month_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="historywrite_Enabled_Quarter" data-field="historywrite_Enabled_Quarter" />
+                <input type="checkbox" class="value" id="history_fill_history_Quarter_enabled" data-field="history_fill_history_Quarter_enabled" />
                 <span class="translate">04_current_Quarter</span>
-                <input type="number" class="value minDelta" id="historywrite_MinChange_Quarter" data-field="historywrite_MinChange_Quarter" />
+                <input type="number" class="value minDelta" id="history_fill_history_Quarter_MinChange" data-field="history_fill_history_Quarter_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="historywrite_Enabled_Year" data-field="historywrite_Enabled_Year" />
+                <input type="checkbox" class="value" id="history_fill_history_Year_enabled" data-field="history_fill_history_Year_enabled" />
                 <span class="translate">05_current_Year</span>
-                <input type="number" class="value minDelta"  id="historywrite_MinChange_Year" data-field="historywrite_MinChange_Year" />
+                <input type="number" class="value minDelta"  id="history_fill_history_Year_MinChange" data-field="history_fill_history_Year_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
         </div>
@@ -359,21 +359,21 @@
                 counterResetDetection: instanceObj.native.counterResetDetection,
                 counterResetDetetion_CountAfterReset: instanceObj.native.counterResetDetetion_CountAfterReset,
                 history_work: false,
-                historyInstanz: instanceObj.native.historyInstanz,
-                history_detailed: instanceObj.native.history_detailed,
-                history_before: instanceObj.native.history_before,
-                history_startvalues: instanceObj.native.history_startvalues,
-                historywrite_Instanz: instanceObj.native.historywrite_Instanz,
-                historywrite_Enabled_Day: instanceObj.native.historywrite_Enabled_Day,
-                historywrite_MinChange_Day: instanceObj.native.historywrite_MinChange_Day,
-                historywrite_Enabled_Week: instanceObj.native.historywrite_Enabled_Week,
-                historywrite_MinChange_Week: instanceObj.native.historywrite_MinChange_Week,
-                historywrite_Enabled_Month: instanceObj.native.historywrite_Enabled_Month,
-                historywrite_MinChange_Month: instanceObj.native.historywrite_MinChange_Month,
-                historywrite_Enabled_Quarter: instanceObj.native.historywrite_Enabled_Quarter,
-                historywrite_MinChange_Quarter: instanceObj.native.historywrite_MinChange_Quarter,
-                historywrite_Enabled_Year: instanceObj.native.historywrite_Enabled_Year,
-                historywrite_MinChange_Year: instanceObj.native.historywrite_MinChange_Year
+                history_Instanz: instanceObj.native.history_Instanz,
+                history_fill_detailed: instanceObj.native.history_fill_detailed,
+                history_fill_before: instanceObj.native.history_fill_before,
+                history_fill_startvalues: instanceObj.native.history_fill_startvalues,
+                history_fill_history_Instanz: instanceObj.native.history_fill_history_Instanz,
+                history_fill_history_Day_enabled: instanceObj.native.history_fill_history_Day_enabled,
+                history_fill_history_Day_MinChange: instanceObj.native.history_fill_history_Day_MinChange,
+                history_fill_history_Week_enabled: instanceObj.native.history_fill_history_Week_enabled,
+                history_fill_history_Week_MinChange: instanceObj.native.history_fill_history_Week_MinChange,
+                history_fill_history_Month_enabled: instanceObj.native.history_fill_history_Month_enabled,
+                history_fill_history_Month_MinChange: instanceObj.native.history_fill_history_Month_MinChange,
+                history_fill_history_Quarter_enabled: instanceObj.native.history_fill_history_Quarter_enabled,
+                history_fill_history_Quarter_MinChange: instanceObj.native.history_fill_history_Quarter_MinChange,
+                history_fill_history_Year_enabled: instanceObj.native.history_fill_history_Year_enabled,
+                history_fill_history_Year_MinChange: instanceObj.native.history_fill_history_Year_MinChange
             };
         }
     }

@@ -266,9 +266,9 @@ class valuetrackerovertime extends utils.Adapter {
 
 
                 //HistoryLoad
-                if (oS.history_work) {
+                if (oS.history_work ) {
                     iobrokerObject.common.custom[this.namespace].history_work = false;
-                    await this.setForeignObjectAsync(oS.id, iobrokerObject);
+                    //await this.setForeignObjectAsync(oS.id, iobrokerObject);
 
                     await this._readDetailedFromHistory_SQL(oS);
                     return;
@@ -727,7 +727,7 @@ class valuetrackerovertime extends utils.Adapter {
             return Checkdate
         }
         if (TimeFrame == TimeFrames.Week) {
-            Checkdate.setDate(Checkdate.getDate() - (Checkdate.getDay() == 0 ? -6 : Checkdate.getDay() - 1))
+            Checkdate.setDate(Checkdate.getDate() - (Checkdate.getDay() == 0 ? 6 : Checkdate.getDay() - 1))
             return Checkdate
         }
         Checkdate.setDate(1);
@@ -757,15 +757,16 @@ class valuetrackerovertime extends utils.Adapter {
     async _CreateAndGetObjectIdDetailedCurrent(oS, TimeFrame, date) {
         if (oS.detailed_current(TimeFrame)) {
             let mydetailedObjectId = "";
-            let Checkdate2 = await this._getTimeFrameBeginn(TimeFrame, new Date())
-            Checkdate2 = await this.addOneTimeFrame(TimeFrame, Checkdate2,  1 )
+            let endOfTimeFrame = await this._getTimeFrameBeginn(TimeFrame, new Date())
+            endOfTimeFrame = await this.addOneTimeFrame(TimeFrame, endOfTimeFrame, 1)
+            endOfTimeFrame.setMilliseconds(-1)
 
+            let currentDataRelevantBegin = new Date(endOfTimeFrame)
             if (TimeFrame != TimeFrames.Year) {
                 mydetailedObjectId = mydetailedObjectId + "." + TimeFramesNumber[TimeFrame] + "_" + TimeFrame + "s";
                 await this._setExtendChannel(oS, mydetailedObjectId, TimeFrame + "s", true);
                 if (TimeFrame == TimeFrames.Day) {
-                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Day, Checkdate2, -7  )
-                    if (date >= Checkdate2) {
+                    if (date >= await this.addOneTimeFrame(TimeFrames.Day, endOfTimeFrame, -7)) {
                         let myDayNumber = date.getDay();
                         if (myDayNumber == 0)
                             myDayNumber = 7;
@@ -775,10 +776,8 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Week) {
-                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
-
-
-                    if (date >= Checkdate2) {
+                    currentDataRelevantBegin.setDate(currentDataRelevantBegin.getDate() - 7)
+                    if (date >= currentDataRelevantBegin) {
                         {
                             mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Week, date);
                             await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Week, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -788,8 +787,8 @@ class valuetrackerovertime extends utils.Adapter {
                     }
                 }
                 if (TimeFrame == TimeFrames.Month) {
-                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
-                    if (date >= Checkdate2) {
+                    currentDataRelevantBegin.setFullYear(currentDataRelevantBegin.getFullYear() - 1)
+                    if (date >= currentDataRelevantBegin) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Month, date);
                         await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Month, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -798,8 +797,8 @@ class valuetrackerovertime extends utils.Adapter {
                 }
 
                 if (TimeFrame == TimeFrames.Quarter) {
-                    Checkdate2 = await this.addOneTimeFrame(TimeFrames.Year, Checkdate2, -1 )
-                    if (date >= Checkdate2) {
+                    currentDataRelevantBegin.setFullYear(currentDataRelevantBegin.getFullYear() - 1)
+                    if (date >= currentDataRelevantBegin) {
 
                         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Quarter, date);
                         await this._setExtendObject(oS, mydetailedObjectId, await this._getTimeFrameInfo(TimeFrames.Quarter, date), "value.currenthistory." + TimeFrame, true, false, oS.output_unit, "number");
@@ -874,46 +873,41 @@ class valuetrackerovertime extends utils.Adapter {
 
 
 
-    async _writeCurrHistory(oS, ts, lastGoodhis, TimeFrame, hisstartvalues, mustWrite, lastwriteValues) {
-        if (oS.historyload_writehistory) {
-            let currentDP = oS.alias + await this._getObjectIDCurrent(TimeFrame)
-            let currentDPObject = await this._getObjectAsync(currentDP)
-
-            if (!lastwriteValues[TimeFrame]) {
-                lastwriteValues[TimeFrame] = -1000
+    /**
+     * 
+     * @param {ObjectSettings} oS
+     */
+    async _writeCurrHistory(oS, ts, TimeFrame, mustWrite) {
+        if (oS.history_fill_history_enabled[TimeFrame] && oS.historyReadoutData.lastGoodhis) {
+            // Initial delete old Data and set new lastwriteValue
+            if (!oS.historyReadoutData.lastwriteValues[TimeFrame]) {
+                oS.historyReadoutData.lastwriteValues[TimeFrame] = -1000
                 const gethistory = await this.sendToAsync(oS.historyInstanz, 'deleteRange', [
-                    { id: this.namespace + "." + currentDP, start: ts, end: (new Date().getTime()) }
+                    { id: oS.history_fill_history_DPs[TimeFrame], start: ts, end: (new Date().getTime()) }
                 ]);
-
             }
+            let changesMinDelta = oS.history_fill_history_MinChange[TimeFrame]
+
+            let val = (oS.historyReadoutData.lastGoodhis.val - oS.historyReadoutData.hisstartvalues[TimeFrame]) * oS.output_multiplier
+            if (mustWrite || Math.abs(val - oS.historyReadoutData.lastwriteValues[TimeFrame]) >= changesMinDelta) {
 
 
-            if (currentDPObject && currentDPObject.common && currentDPObject.common.custom && currentDPObject.common.custom[oS.historyload_writehistory_instance] && currentDPObject.common.custom[oS.historyload_writehistory_instance].enabled) {
-                let aktive = true
-                let changesMinDelta = currentDPObject.common.custom[oS.historyload_writehistory_instance].changesMinDelta
-
-                let val = (lastGoodhis.val - hisstartvalues[TimeFrames.Day]) * oS.output_multiplier
-                if (mustWrite || Math.abs(val - lastwriteValues[TimeFrame]) >= changesMinDelta) {
-                    let id = this.namespace + "." + currentDP
-
-                    const sethistory = await this.sendToAsync(oS.historyload_writehistory_instance, "storeState",
-                        {
-                            id: id,
-                            state: { val: val, ts: ts }
-                        });
-                    const waitforDB = await this.sendToAsync('sql.0', 'query', 'SELECT NOW()');
-
-                    lastwriteValues[TimeFrame] = val
-                    return 1
-
+                if (oS.historyReadoutData.workcount_historyWrite % 50 == 0) {
+                    const waitforDB = await this.sendToAsync(oS.history_fill_history_Instanz, 'query', '')
                 }
+                const sethistory = await this.sendToAsync(oS.history_fill_history_Instanz, "storeState",
+                    {
+                        id: oS.history_fill_history_DPs[TimeFrame],
+                        state: { val: val, ts: ts }
+                    });
 
 
 
+                oS.historyReadoutData.lastwriteValues[TimeFrame] = val
+                oS.historyReadoutData.workcount_historyWrite += 1
 
             }
         }
-        return 0
     }
 
     /**
@@ -957,49 +951,47 @@ class valuetrackerovertime extends utils.Adapter {
 
     }
 
+
+
     /**
      * Creates the needed TreeStructure and returns the Id after alias-name
      * @param {ObjectSettings} oS
      * @param {string} TimeFrame
-     * @param {Date} date
-     * @param {Number} TimeFrame_value
+     * @param {Date} MyHisDate
      * */
-    async _CreateAndSetObjectIdDetailed2(oS, TimeFrame, date, TimeFrame_value) {
-        if (oS.history_detailed)
-            await this._CreateAndSetObjectIdDetailed(oS, TimeFrame, date, TimeFrame_value)
-    }
+    async _HistoryTimeFrameDetection(oS, TimeFrame, MyHisDate) {
+        if (oS.historyReadoutData.lastGoodhis && oS.historyReadoutData.lastHis) {
+            if (MyHisDate.getDate() == oS.historyReadoutData.lastHis.date.getDate() && MyHisDate.getFullYear() == oS.historyReadoutData.lastHis.date.getFullYear() && MyHisDate.getMonth() == oS.historyReadoutData.lastHis.date.getMonth()) {
+                // wenn gleicher Tag wie vorheriges datum, dann kann kein TimeFrameWechsel sein
+                return
+            }
+            let startForMyHisDate = await this._getTimeFrameBeginn(TimeFrame, MyHisDate)
+            let startForOldTimeframe = await this._getTimeFrameBeginn(TimeFrame, oS.historyReadoutData.lastHis.date);
 
-    async testTimeFrameErkennung(data, TimeFrame,  MyHisDate, CheckTimeFrameFunc, AddTimeFrameFunc    ){
-        let workcount_historyWrite = 0
-        let workcount_detailed = 0
-        //TimeframeChange erkennen
-        let dateCheckIsOldTimeframe = new Date(data.LastHisDate);
-        while (CheckTimeFrameFunc(MyHisDate, dateCheckIsOldTimeframe)) {
-            await this._CreateAndSetObjectIdDetailed(data.oS, TimeFrame, dateCheckIsOldTimeframe, (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Day]));
-            data.TimeFrameValueData[TimeFrames.Day].push({ date: new Date(dateCheckIsOldTimeframe), value: (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Day]) });
+            while (startForOldTimeframe < startForMyHisDate) {
+                let TimeFrameValue = (oS.historyReadoutData.lastGoodhis.val - oS.historyReadoutData.hisstartvalues[TimeFrame])
+                if (oS.history_fill_detailed) {
+                    //Detailed setzen
+                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrame, startForOldTimeframe, TimeFrameValue);
+                    oS.historyReadoutData.workcount_detailed += 1
+                }
+                if (oS.history_fill_before) {
+                    //liste füllen (für before-Data)
+                    oS.historyReadoutData.TimeFrameValueData[TimeFrame].push({ date: new Date(startForOldTimeframe), value: TimeFrameValue });
+                }
 
-            dateCheckIsOldTimeframe = AddTimeFrameFunc(dateCheckIsOldTimeframe)
-            
-            workcount_historyWrite += await this._writeCurrHistory(data.oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime() - 1, data.lastGoodhis, TimeFrames.Day, data.hisstartvalues, true, data.lastwriteValues)
-            data.hisstartvalues[TimeFrames.Day] = data.lastGoodhis.val;
-            workcount_historyWrite += await this._writeCurrHistory(data.oS, (await this._getTimeFrameBeginn(TimeFrames.Day, dateCheckIsOldTimeframe)).getTime(), data.lastGoodhis, TimeFrames.Day, data.hisstartvalues, true, data.lastwriteValues)
-            workcount_detailed += 0
-        }
-
-
-    }
-    async checkTimeFrameChange(TimeFrame, oldDate, newDate) {
-        if (TimeFrame == TimeFrames.Day){
-            return newDate.getDate() > oldDate.getDate() || newDate.getMonth() > oldDate.getMonth() || newDate.getFullYear() > oldDate.getFullYear()                    
-        }
-        if (TimeFrame == TimeFrames.Week){
-            const newDate_KWInfo = new KWInfo(newDate);
-            const oldDate_KWInfo = new KWInfo(oldDate);
-            return newDate_KWInfo.weekNumber > oldDate_KWInfo.weekNumber || newDate_KWInfo.yearOfThursday > oldDate_KWInfo.yearOfThursday
+                startForOldTimeframe = await this.addOneTimeFrame(TimeFrame, startForOldTimeframe, 1)
+                await this._writeCurrHistory(oS, startForOldTimeframe.getTime() - 1, TimeFrame, true)
+                oS.historyReadoutData.hisstartvalues[TimeFrame] = oS.historyReadoutData.lastGoodhis.val;
+                await this._writeCurrHistory(oS, startForOldTimeframe.getTime(), TimeFrame, true)
+            }
 
         }
 
+
+
     }
+
 
 
     async addOneTimeFrame(TimeFrame, theDate, numberofChange) {
@@ -1017,7 +1009,7 @@ class valuetrackerovertime extends utils.Adapter {
         } else if (TimeFrame == TimeFrames.Quarter) {
             newdate.setMonth(newdate.getMonth() + (numberofChange * 3));
         } else if (TimeFrame == TimeFrames.Year) {
-            newdate.setFullYear(newdate.getFullYear() - numberofChange);
+            newdate.setFullYear(newdate.getFullYear() + numberofChange);
         }
         return newdate
     }
@@ -1030,171 +1022,125 @@ class valuetrackerovertime extends utils.Adapter {
     async _readDetailedFromHisory(oS, HistoryDataList) {
         this.log.info("HistoryAnalyseDetailed " + oS.id + ": Verarbeite " + HistoryDataList.length + " History Datensätze ");
 
-        let data = {}
-        data.oS = oS
-        data.workcount_detailed = 0;
-        data.workcount_before = 0;
 
-        data. workcount_historyWrite = 0;
-
-        data. resetsDetected = 0;
-
-        data. hisstartvalues = {};
-        data. lastGoodhis = null;
-        data. FirstWronghis = null;
-        data. counterResetDetetion_CurrentCountAfterReset = 0;
-        data.lastWronghis = null;
-
-
-        data.lastwriteValues = {}
-        const TimeFrameValueData = {};
+        //Check the history_fill_history Settings
         for (const TimeFrame in TimeFrames) {
-            TimeFrameValueData[TimeFrame] = [];
-        }
 
-        data.LastHis;
-        for (const zahler in HistoryDataList) {
-            const myHis = HistoryDataList[zahler];
-            if (!data.LastHis || !data.lastGoodhis) {
+            oS.history_fill_history_DPs[TimeFrame] = this.namespace + "." + oS.alias + await this._getObjectIDCurrent(TimeFrame)
 
-                data.lastGoodhis = myHis;
-                for (const TimeFrame in TimeFrames) {
-                    data.hisstartvalues[TimeFrame] = myHis.val;
-                }
-            }
-            else {
-
-                let CheckTimeFrameDayFunc = function(myHisDate, dateCheckIsOldTimeframe){
-                    return myHisDate.getDate() > dateCheckIsOldTimeframe.getDate() || myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()                    
-                }
-
-                let AddTimeFrameDayFunc = function(Datex) {
-                    let ret = new Date(Datex)
-                    ret.setDate(ret.getDate() + 1);
-                    return ret
-                }
-                await this.testTimeFrameErkennung( data, TimeFrames.Day, myHis.date, CheckTimeFrameDayFunc, AddTimeFrameDayFunc)
-
-                //TimeframeChange erkennen
-                let dateCheckIsOldTimeframe = new Date(data.LastHis.date);
-
-               
-
-                dateCheckIsOldTimeframe = new Date(data.LastHis.date);
-                let CheckTimeFrameWeekFunc = function(myHisDate, dateCheckIsOldTimeframe){
-                    const myHisKWInfo = new KWInfo(myHisDate);
-                    const dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
-                    return myHisKWInfo.weekNumber > dateCheckIsOldTimeframe_KWInfo.weekNumber || myHisKWInfo.yearOfThursday > dateCheckIsOldTimeframe_KWInfo.yearOfThursday
-
-                }
-
-                let AddTimeFrameWeekFunc = function(Datex) {
-                    let ret = new Date(Datex)
-                    ret.setDate(ret.getDate() + 7);
-                    return ret
-                }
-                await this.testTimeFrameErkennung( data, TimeFrames.Week, myHis.date, CheckTimeFrameWeekFunc, AddTimeFrameWeekFunc )
-
-
-                let dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
-                const myHisKWInfo = new KWInfo(myHis.date);
-                while (myHisKWInfo.weekNumber > dateCheckIsOldTimeframe_KWInfo.weekNumber || myHisKWInfo.yearOfThursday > dateCheckIsOldTimeframe_KWInfo.yearOfThursday) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Week, dateCheckIsOldTimeframe, (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Week]));
-                    TimeFrameValueData[TimeFrames.Week].push({ date: new Date(dateCheckIsOldTimeframe), value: (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Week]) });
-
-                    data.hisstartvalues[TimeFrames.Week] = data.lastGoodhis.val;
-                    data.workcount_detailed++;
-                    dateCheckIsOldTimeframe.setDate(dateCheckIsOldTimeframe.getDate() + 7);
-                    dateCheckIsOldTimeframe_KWInfo = new KWInfo(dateCheckIsOldTimeframe);
-
-                }
-                
-
-                dateCheckIsOldTimeframe = new Date(data.LastHis.date);
-                while (myHis.date.getMonth() > dateCheckIsOldTimeframe.getMonth() || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Month, dateCheckIsOldTimeframe, (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Month]));
-                    TimeFrameValueData[TimeFrames.Month].push({ date: new Date(dateCheckIsOldTimeframe), value: (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Month]) });
-
-                    data.hisstartvalues[TimeFrames.Month] = data.lastGoodhis.val;
-
-                    data.workcount_detailed++;
-                    dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 1);
-                }
-
-                dateCheckIsOldTimeframe = new Date(data.LastHis.date);
-                while (Math.floor(myHis.date.getMonth() / 3) > Math.floor(dateCheckIsOldTimeframe.getMonth() / 3) || myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Quarter, dateCheckIsOldTimeframe, (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Quarter]));
-                    TimeFrameValueData[TimeFrames.Quarter].push({ date: new Date(dateCheckIsOldTimeframe), value: (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Quarter]) });
-
-                    data.hisstartvalues[TimeFrames.Quarter] = data.lastGoodhis.val;
-                    dateCheckIsOldTimeframe.setMonth(dateCheckIsOldTimeframe.getMonth() + 3);
-                    data.workcount_detailed++;
-                }
-
-                dateCheckIsOldTimeframe = new Date(data.LastHis.date);
-                while (myHis.date.getFullYear() > dateCheckIsOldTimeframe.getFullYear()) {
-                    await this._CreateAndSetObjectIdDetailed(oS, TimeFrames.Year, dateCheckIsOldTimeframe, (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Year]));
-                    TimeFrameValueData[TimeFrames.Year].push({ date: new Date(dateCheckIsOldTimeframe), value: (data.lastGoodhis.val - data.hisstartvalues[TimeFrames.Year]) });
-
-                    data.hisstartvalues[TimeFrames.Year] = data.lastGoodhis.val;
-                    data. workcount_detailed++;
-                    dateCheckIsOldTimeframe.setFullYear(dateCheckIsOldTimeframe.getFullYear() + 1);
-                }
-
-
-                //Reset detection
-                if (oS.counterResetDetection && myHis.val < data.lastGoodhis.val) {
-                    //Verringerung erkannt -> neuanpassung der startWerte
-                    if (data.FirstWronghis == null) {
-                        data.FirstWronghis = myHis;
-                        data.counterResetDetetion_CurrentCountAfterReset = 0;
-                        data.lastWronghis = null;
-                    }
-                    if (data.lastWronghis == null || data.lastWronghis.val != myHis.val) {
-                        data.counterResetDetetion_CurrentCountAfterReset += 1;
-                        data.lastWronghis = myHis;
-                    }
-                    if (data.counterResetDetetion_CurrentCountAfterReset <= oS.counterResetDetetion_CountAfterReset) {
-                        //return;
-                    }
-                    else {
-                        const theAnpassung = data.lastGoodhis.val - data.FirstWronghis.val;
-
-
-                        this.log.warn("HistoryAnalyseDetailed " + oS.id + ": Counter wurde scheinbar resetet! Reset von " + data.lastGoodhis.val + " nach " + data.FirstWronghis.val + ", passe alle Startwerte an");
-                        data.lastGoodhis = myHis;
-                        data.FirstWronghis = null;
-                        data.resetsDetected++;
-                        for (const TimeFrame in TimeFrames) {
-                            data.hisstartvalues[TimeFrame] = data.hisstartvalues[TimeFrame] - theAnpassung;
-                        }
-
-                    }
+            //Check instance is enabled
+            if (oS.history_fill_history_enabled[TimeFrame]) {
+                let curobj = await this.getForeignObjectAsync(oS.history_fill_history_DPs[TimeFrame])
+                if (curobj && curobj.common.custom && curobj.common.custom[oS.history_fill_history_Instanz] && curobj.common.custom[oS.history_fill_history_Instanz].enabled) {
 
                 }
                 else {
-                    data.FirstWronghis = null;
-                    data.lastGoodhis = myHis;
+                    this.log.warn(`history_fill: ${oS.history_fill_history_DPs[TimeFrame]} history should be filled, but Instance ${oS.history_fill_history_Instanz} is not enabled`)
+                    oS.history_fill_history_enabled[TimeFrame] = false
+                }
+            }
+            //Read MinChange from DP
+            if (oS.history_fill_history_enabled[TimeFrame] && oS.history_fill_history_MinChange[TimeFrame] == 0) {
+                let curobj = await this.getForeignObjectAsync(oS.history_fill_history_DPs[TimeFrame])
+                if (curobj && curobj.common.custom && curobj.common.custom[oS.history_fill_history_Instanz] && curobj.common.custom[oS.history_fill_history_Instanz].changesMinDelta) {
+                    oS.history_fill_history_MinChange[TimeFrame] = curobj.common.custom[oS.history_fill_history_Instanz].changesMinDelta
+                    this.log.info(`readout Minchange ${oS.history_fill_history_MinChange[TimeFrame]} from dp oS.history_fill_history_DPs[TimeFrame]`)
+                }
+            }
+        }
+        let nextLog = Date.now() + 10000
+        let logsworked = 0
+        let lastlogsworked = 0
+        let lastworkcount_historyWrite = 0
+
+
+
+        oS.historyReadoutData.lastGoodhis = HistoryDataList[0];
+        for (const TimeFrame in TimeFrames) {
+            oS.historyReadoutData.hisstartvalues[TimeFrame] = HistoryDataList[0].val;
+        }
+        oS.historyReadoutData.lastHis = HistoryDataList[0];
+
+
+
+        for (const zahler in HistoryDataList) {
+            logsworked += 1
+            const myHis = HistoryDataList[zahler];
+
+            await this._HistoryTimeFrameDetection(oS, TimeFrames.Day, myHis.date)
+            await this._HistoryTimeFrameDetection(oS, TimeFrames.Week, myHis.date)
+            await this._HistoryTimeFrameDetection(oS, TimeFrames.Month, myHis.date)
+            await this._HistoryTimeFrameDetection(oS, TimeFrames.Quarter, myHis.date)
+            await this._HistoryTimeFrameDetection(oS, TimeFrames.Year, myHis.date)
+
+
+
+            //Reset detection
+            if (oS.counterResetDetection && myHis.val < oS.historyReadoutData.lastGoodhis.val) {
+                //Verringerung erkannt -> neuanpassung der startWerte
+                if (oS.historyReadoutData.FirstWronghis == null) {
+                    oS.historyReadoutData.FirstWronghis = myHis;
+                    oS.historyReadoutData.counterResetDetetion_CurrentCountAfterReset = 0;
+                    oS.historyReadoutData.lastWronghis = null;
+                }
+                if (oS.historyReadoutData.lastWronghis == null || oS.historyReadoutData.lastWronghis.val != myHis.val) {
+                    oS.historyReadoutData.counterResetDetetion_CurrentCountAfterReset += 1;
+                    oS.historyReadoutData.lastWronghis = myHis;
+                }
+                if (oS.historyReadoutData.counterResetDetetion_CurrentCountAfterReset <= oS.counterResetDetetion_CountAfterReset) {
+                    //return;
+                }
+                else {
+                    const theAnpassung = oS.historyReadoutData.lastGoodhis.val - oS.historyReadoutData.FirstWronghis.val;
+
+
+                    this.log.warn("HistoryAnalyseDetailed " + oS.id + ": Counter wurde scheinbar resetet! Reset von " + oS.historyReadoutData.lastGoodhis.val + " nach " + oS.historyReadoutData.FirstWronghis.val + ", passe alle Startwerte an");
+                    oS.historyReadoutData.lastGoodhis = myHis;
+                    oS.historyReadoutData.FirstWronghis = null;
+                    oS.historyReadoutData.resetsDetected++;
+                    for (const TimeFrame in TimeFrames) {
+                        oS.historyReadoutData.hisstartvalues[TimeFrame] = oS.historyReadoutData.hisstartvalues[TimeFrame] - theAnpassung;
+                    }
 
                 }
-                if (data.lastGoodhis === myHis) {
-                    data.workcount_historyWrite += await this._writeCurrHistory(oS, myHis.date.getTime(), data.lastGoodhis, TimeFrames.Day, data.hisstartvalues, false, data.lastwriteValues)
 
-                }
+            }
+            else {
+                oS.historyReadoutData.FirstWronghis = null;
+                oS.historyReadoutData.lastGoodhis = myHis;
 
+            }
+            if (oS.historyReadoutData.lastGoodhis === myHis) {
+                await this._writeCurrHistory(oS, myHis.date.getTime(), TimeFrames.Day, false)
+                await this._writeCurrHistory(oS, myHis.date.getTime(), TimeFrames.Week, false)
+                await this._writeCurrHistory(oS, myHis.date.getTime(), TimeFrames.Month, false)
+                await this._writeCurrHistory(oS, myHis.date.getTime(), TimeFrames.Quarter, false)
+                await this._writeCurrHistory(oS, myHis.date.getTime(), TimeFrames.Year, false)
+            }
+
+
+
+
+            oS.historyReadoutData.lastHis = myHis;
+
+
+            if (nextLog < Date.now()) {
+                const zeitSeitlastlog = Date.now() - nextLog + 10000
+                this.log.info("HistoryAnalyseDetailed " + oS.id + ": Already Analysed: " + logsworked + " (" + Math.round((logsworked - lastlogsworked) / (zeitSeitlastlog / 1000)) + " pro s) workcount_detailed: " + oS.historyReadoutData.workcount_detailed + " Resets detected: " + oS.historyReadoutData.resetsDetected + " HistoryWrite: " + oS.historyReadoutData.workcount_historyWrite + " (" + Math.round((oS.historyReadoutData.workcount_historyWrite - lastworkcount_historyWrite) / (zeitSeitlastlog / 1000)) + " pro s)");
+                lastlogsworked = logsworked
+                lastworkcount_historyWrite = oS.historyReadoutData.workcount_historyWrite
+                nextLog = Date.now() + 10000
 
             }
 
 
-            data.LastHis = myHis;
-
         }
         //before befüllen
-        if (oS.history_before) {
+        if (oS.history_fill_before) {
             for (const TimeFrame in TimeFrames) {
                 if (!(TimeFrame == TimeFrames.Minute || TimeFrame == TimeFrames.Hour)) {
                     /** @type {Array<{date:Date, value:Number}>} */
-                    const MyTimeFrameData = TimeFrameValueData[TimeFrame];
+                    const MyTimeFrameData = oS.historyReadoutData.TimeFrameValueData[TimeFrame];
                     for (let zahler = oS.beforeCount(TimeFrame); zahler >= 1; zahler--) {
                         if (MyTimeFrameData.length >= zahler) {
                             await this._pushNewPreviousSates(oS, TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].value, await this._getDateTimeInfoForPrevious(TimeFrame, MyTimeFrameData[MyTimeFrameData.length - zahler].date, 0));
@@ -1202,18 +1148,21 @@ class valuetrackerovertime extends utils.Adapter {
                         else {
                             //set no data yet
                             await this._pushNewPreviousSates(oS, TimeFrame, 0, "no data");
-
                         }
                     }
-
-                    await this._setStartValue(oS, TimeFrame, data.hisstartvalues[TimeFrame]);
-
                 }
             }
         }
+        //startvalues befüllen
+        if (oS.history_fill_startvalues) {
+            for (const TimeFrame in TimeFrames) {
+                await this._setStartValue(oS, TimeFrame, oS.historyReadoutData.hisstartvalues[TimeFrame]);
+            }
+
+        }
 
 
-        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + data.workcount_detailed + " Resets detected: " + data.resetsDetected + " HistoryWrite: " + data.workcount_historyWrite);
+        this.log.info("HistoryAnalyseDetailed " + oS.id + ": Finished HistoryAnalyse. Created DetailedDatapoints: " + oS.historyReadoutData.workcount_detailed + " Resets detected: " + oS.historyReadoutData.resetsDetected + " HistoryWrite: " + oS.historyReadoutData.workcount_historyWrite);
     }
 
 }
