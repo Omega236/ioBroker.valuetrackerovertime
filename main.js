@@ -148,7 +148,7 @@ class valuetrackerovertime extends utils.Adapter {
         try {
             await this.unsubscribeForeignStatesAsync('*')
             await this.unsubscribeForeignObjectsAsync('*')
-            for (let cron_i in this.crons){
+            for (let cron_i in this.crons) {
                 let onecron = this.crons[cron_i]
                 onecron.destroy();
             }
@@ -196,14 +196,19 @@ class valuetrackerovertime extends utils.Adapter {
 
 
         const objectschannels = await this.getForeignObjectsAsync(this.namespace + "*", "channel");
+
         for (const id in objectschannels) {
             await this._setMyObject(id, objectschannels[id]);
         }
-        // read out all Objects
-        const objects = await this.getForeignObjectsAsync("", "state", null);
-        for (const id in objects) {
-            await this._initialObject(objects[id]);
 
+        const objectView = await this.getObjectViewAsync('custom', 'state', null)
+        if (objectView && objectView.rows) {
+            for (const counterObjectView in objectView.rows) {
+                let oneObjectview = objectView.rows[counterObjectView]
+                if (oneObjectview && oneObjectview.value && this.namespace in oneObjectview.value) {
+                    await this._initialObject( await this.getForeignObjectAsync(oneObjectview.id) );
+                }
+            }
         }
         this.log.info("initial completed");
     }
