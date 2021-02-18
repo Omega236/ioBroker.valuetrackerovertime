@@ -58,6 +58,7 @@ class valuetrackerovertime extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
         this.writeTrimeFrameInfo = true;
         this.historyWrite = 0;
+        this.crons = []
 
     }
 
@@ -72,28 +73,29 @@ class valuetrackerovertime extends utils.Adapter {
 
         await this.subscribeForeignObjectsAsync("*");
         await this.initialObjects();
-
-        cron.schedule("* * * * *", async () => {
+        this.crons.push(cron.schedule("* * * * *", async () => {
             await this._timeFrameFinished(TimeFrames.Minute);
-        });
-        cron.schedule("0 * * * *", async () => {
+        }));
+        this.crons.push(cron.schedule("0 * * * *", async () => {
             await this._timeFrameFinished(TimeFrames.Hour);
-        });
-        cron.schedule("0 0 * * *", async () => {
+        }));
+        this.crons.push(cron.schedule("0 0 * * *", async () => {
             await this._timeFrameFinished(TimeFrames.Day);
-        });
-        cron.schedule("0 0 * * 1", async () => {
+        }));
+        this.crons.push(cron.schedule("0 0 * * 1", async () => {
             await this._timeFrameFinished(TimeFrames.Week);
-        });
-        cron.schedule("0 0 1 * *", async () => {
+        }));
+        this.crons.push(cron.schedule("0 0 1 * *", async () => {
             await this._timeFrameFinished(TimeFrames.Month);
-        });
-        cron.schedule("0 0 1 */3 *", async () => {
+        }));
+        this.crons.push(cron.schedule("0 0 1 */3 *", async () => {
             await this._timeFrameFinished(TimeFrames.Quarter);
-        });
-        cron.schedule("0 0 1 1 *", async () => {
+        }));
+        this.crons.push(cron.schedule("0 0 1 1 *", async () => {
             await this._timeFrameFinished(TimeFrames.Year);
-        });
+        }));
+
+
     }
 
     /**
@@ -142,8 +144,14 @@ class valuetrackerovertime extends utils.Adapter {
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
      */
-    onUnload(callback) {
+    async onUnload(callback) {
         try {
+            await this.unsubscribeForeignStatesAsync('*')
+            await this.unsubscribeForeignObjectsAsync('*')
+            for (let cron_i in this.crons){
+                let onecron = this.crons[cron_i]
+                onecron.destroy();
+            }
             callback();
         } catch (e) {
             callback();
@@ -1071,10 +1079,6 @@ class valuetrackerovertime extends utils.Adapter {
 
         }
 
-
-
-
-
         for (const zahler in historyDataList) {
             const myHis = historyDataList[zahler];
 
@@ -1142,7 +1146,7 @@ class valuetrackerovertime extends utils.Adapter {
             if (writenextLog < Date.now()) {
 
                 const zeitSeitlastlogS = (Date.now() - lastlog) / 1000;
-                this.log.info("HistoryAnalyse " + oS.id + " working state " + Math.round(( oS.historyReadoutData.workcounts.analysed / historyDataList.length) * 100)  + "% " +
+                this.log.info("HistoryAnalyse " + oS.id + " working state " + Math.round((oS.historyReadoutData.workcounts.analysed / historyDataList.length) * 100) + "% " +
                     "; Resets detected: " + oS.historyReadoutData.resetsDetected +
                     "; History Entrys Analysed: " + oS.historyReadoutData.workcounts.analysed + " (" + Math.round((oS.historyReadoutData.workcounts.analysed - oS.historyReadoutData.workcounts.analysed_last) / zeitSeitlastlogS) + " pro s)" +
                     "; detailed write: " + oS.historyReadoutData.workcounts.detailed + " (" + Math.round((oS.historyReadoutData.workcounts.detailed - oS.historyReadoutData.workcounts.detailed_last) / zeitSeitlastlogS) + " pro s)" +
