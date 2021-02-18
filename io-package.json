@@ -193,7 +193,7 @@
         "readme": "https://github.com/Omega236/ioBroker.valuetrackerovertime/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
-        "type": "storage",
+        "type": "misc-data",
         "compact": true,
         "connectionType": "local",
         "dataSource": "poll",
