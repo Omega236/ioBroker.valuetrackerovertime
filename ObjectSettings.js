@@ -121,7 +121,6 @@ class ObjectSettings {
         return String(ret);
     }
 
-    get historyInstanz() { return String(this.myCustomSettings.historyInstanz); }
 
 
 

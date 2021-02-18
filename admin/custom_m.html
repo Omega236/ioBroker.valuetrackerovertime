@@ -184,7 +184,7 @@
         <div class="col s3 input-field ">
             <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
             <span class="translate onlyinCustom">readout now</span>
-            <input type="text" class="value " id="history_Instanz" data-field="history_Instanz" />
+            <input placeholder="Leave empty to use the defaultHistory" type="text" class="value " id="history_Instanz" data-field="history_Instanz" />
             <span class="translate">Use the data from this history instance, these adapters should work: sql.x or
                 influxdb.x
                 or history.x</span>
@@ -216,7 +216,7 @@
                     data-field="history_fill_history_Day_enabled" />
                 <span class="translate">01_current_Day</span>
                 <input type="number"
-                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending always write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
                     class="value minDelta" id="history_fill_history_Day_MinChange"
                     data-field="history_fill_history_Day_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
@@ -226,7 +226,7 @@
                     data-field="history_fill_history_Week_enabled" />
                 <span class="translate">02_current_Week</span>
                 <input type="number"
-                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending always write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
                     class="value minDelta" id="history_fill_history_Week_MinChange"
                     data-field="history_fill_history_Week_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
@@ -236,7 +236,7 @@
                     data-field="history_fill_history_Month_enabled" />
                 <span class="translate">03_current_Month</span>
                 <input type="number"
-                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending always write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
                     class="value minDelta" id="history_fill_history_Month_MinChange"
                     data-field="history_fill_history_Month_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
@@ -246,7 +246,7 @@
                     data-field="history_fill_history_Quarter_enabled" />
                 <span class="translate">04_current_Quarter</span>
                 <input type="number"
-                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending always write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
                     class="value minDelta" id="history_fill_history_Quarter_MinChange"
                     data-field="history_fill_history_Quarter_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
@@ -256,7 +256,7 @@
                     data-field="history_fill_history_Year_enabled" />
                 <span class="translate">05_current_Year</span>
                 <input type="number"
-                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending always write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
                     class="value minDelta" id="history_fill_history_Year_MinChange"
                     data-field="history_fill_history_Year_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>

@@ -58,7 +58,7 @@ class valuetrackerovertime extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
         this.writeTrimeFrameInfo = true;
         this.historyWrite = 0;
-        this.crons = []
+        this.crons = [];
 
     }
 
@@ -146,10 +146,10 @@ class valuetrackerovertime extends utils.Adapter {
      */
     async onUnload(callback) {
         try {
-            await this.unsubscribeForeignStatesAsync('*')
-            await this.unsubscribeForeignObjectsAsync('*')
-            for (let cron_i in this.crons) {
-                let onecron = this.crons[cron_i]
+            await this.unsubscribeForeignStatesAsync("*");
+            await this.unsubscribeForeignObjectsAsync("*");
+            for (const cron_i in this.crons) {
+                const onecron = this.crons[cron_i];
                 onecron.destroy();
             }
             callback();
@@ -201,12 +201,12 @@ class valuetrackerovertime extends utils.Adapter {
             await this._setMyObject(id, objectschannels[id]);
         }
 
-        const objectView = await this.getObjectViewAsync('custom', 'state', null)
+        const objectView = await this.getObjectViewAsync("custom", "state", null);
         if (objectView && objectView.rows) {
             for (const counterObjectView in objectView.rows) {
-                let oneObjectview = objectView.rows[counterObjectView]
+                const oneObjectview = objectView.rows[counterObjectView];
                 if (oneObjectview && oneObjectview.value && this.namespace in oneObjectview.value) {
-                    await this._initialObject( await this.getForeignObjectAsync(oneObjectview.id) );
+                    await this._initialObject(await this.getForeignObjectAsync(oneObjectview.id));
                 }
             }
         }
@@ -926,11 +926,23 @@ class valuetrackerovertime extends utils.Adapter {
      * @param {ObjectSettings} oS
      */
     async _history_readDataFromHistory(oS) {
-        this.log.info("HistoryAnalyse " + oS.id + ": Query from " + oS.historyInstanz + " all Data (if not working after this please check the instance is active) ");
+        //Read the history-Instances if empty
+
+        if (!oS.history_Instanz || oS.history_Instanz == "") {
+            const system_config = await this.getForeignObjectAsync("system.config");
+            if (system_config) {
+                oS.history_Instanz = system_config.common.defaultHistory;
+            }
+        }
+        if (!oS.history_fill_history_Instanz || oS.history_fill_history_Instanz == "") {
+            oS.history_fill_history_Instanz = oS.history_Instanz;
+        }
+        this.log.info("HistoryAnalyse " + oS.id + ": Query from Storage Instance  '" + oS.history_Instanz + "' all Data (if not working after this please check the instance is active) ");
+
         const end = Date.now();
         const start = end - 100 * 365 * 24 * 3600000;
 
-        const gethistory = await this.sendToAsync(oS.historyInstanz, "getHistory", {
+        const gethistory = await this.sendToAsync(oS.history_Instanz, "getHistory", {
             id: oS.id,
             options: {
                 end: end,
@@ -1078,7 +1090,7 @@ class valuetrackerovertime extends utils.Adapter {
             }
             //Delete old Data from History
             oS.historyReadoutData.lastwriteValues[TimeFrame] = -1000;
-            await this.sendToAsync(oS.historyInstanz, "deleteRange", [
+            await this.sendToAsync(oS.history_Instanz, "deleteRange", [
                 { id: oS.history_fill_history_DPs[TimeFrame], start: historyDataList[0].date.getTime(), end: (new Date().getTime()) }
             ]);
 
