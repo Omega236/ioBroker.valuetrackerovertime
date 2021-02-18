@@ -22,16 +22,16 @@ class ObjectSettings {
         this.startValues = {};
 
 
-        this.history_work = Boolean(this.myCustomSettings.history_work)
-        this.history_Instanz = String(this.myCustomSettings.history_Instanz)
+        this.history_work = Boolean(this.myCustomSettings.history_work);
+        this.history_Instanz = String(this.myCustomSettings.history_Instanz);
 
-        this.history_fill_detailed = Boolean(this.myCustomSettings.history_fill_detailed)
-        this.history_fill_before = Boolean(this.myCustomSettings.history_fill_before)
-        this.history_fill_startvalues = Boolean(this.myCustomSettings.history_fill_startvalues)
+        this.history_fill_detailed = Boolean(this.myCustomSettings.history_fill_detailed);
+        this.history_fill_before = Boolean(this.myCustomSettings.history_fill_before);
+        this.history_fill_startvalues = Boolean(this.myCustomSettings.history_fill_startvalues);
 
 
-        this.history_fill_history_Instanz = String(this.myCustomSettings.history_fill_history_Instanz)
-        this.history_writehistory = true
+        this.history_fill_history_Instanz = String(this.myCustomSettings.history_fill_history_Instanz);
+        this.history_writehistory = true;
 
         this.history_fill_history_enabled = {
             Day: Boolean(this.myCustomSettings[`history_fill_history_Day_enabled`]),
@@ -39,20 +39,30 @@ class ObjectSettings {
             Month: Boolean(this.myCustomSettings[`history_fill_history_Month_enabled`]),
             Quarter: Boolean(this.myCustomSettings[`history_fill_history_Quarter_enabled`]),
             Year: Boolean(this.myCustomSettings[`history_fill_history_Year_enabled`])
-        }
-        this.history_fill_history_DPs = {}
+        };
+        this.history_fill_history_DPs = {};
         this.history_fill_history_MinChange = {
             Day: Number(this.myCustomSettings[`history_fill_history_Day_MinChange`]),
             Week: Number(this.myCustomSettings[`history_fill_history_Week_MinChange`]),
             Month: Number(this.myCustomSettings[`history_fill_history_Month_MinChange`]),
             Quarter: Number(this.myCustomSettings[`history_fill_history_Quarter_MinChange`]),
             Year: Number(this.myCustomSettings[`history_fill_history_Year_MinChange`])
-        }
+        };
+        this.history_fill_history_parallelstore = 10;
 
-        this.historyReadoutData = {workcount_detailed : 0,
-            workcount_before: 0,
-            workcount_historyWrite: 0,
+        this.historyReadoutData = {
             resetsDetected: 0,
+            workcounts : {
+                analysed: 0,
+                analysed_last: 0,
+                detailed: 0,
+                detailed_last: 0,
+                before: 0,
+                before_last: 0,
+                historyWrite: 0,
+                historyWrite_last: 0
+
+            },
             hisstartvalues: {},
             /**
              * @type {historyData | null}
@@ -61,7 +71,7 @@ class ObjectSettings {
             /**
              * @type {historyData | null}
              */
-            FirstWronghis: null,
+            firstWronghis: null,
             counterResetDetetion_CurrentCountAfterReset : 0,
             /**
              * @type {historyData | null}
@@ -72,25 +82,25 @@ class ObjectSettings {
              */
             lastHis: null,
             lastwriteValues: {},
-            TimeFrameValueData : {
+            timeFrameValueData : {
                 Day: [],
                 Week: [],
                 Month: [],
                 Quarter: [],
                 Year: []
             }
-           
-        }
+
+        };
 
     }
 
 
 
     historywrite_Enabled(TimeFrame) {
-        return Boolean(this.myCustomSettings["historywrite_Enabled_" + TimeFrame])
+        return Boolean(this.myCustomSettings["historywrite_Enabled_" + TimeFrame]);
     }
     historywrite_MinChange(TimeFrame) {
-        return Boolean(this.myCustomSettings["historywrite_MinChange_" + TimeFrame])
+        return Boolean(this.myCustomSettings["historywrite_MinChange_" + TimeFrame]);
     }
 
 
@@ -142,8 +152,8 @@ class ObjectSettings {
         if (TimeFrame == "Minute" || TimeFrame == "Hour")
             return false;
 
-        let asd = "detailed_" + TimeFrame.toLowerCase() + "s"
-        let ret = this.myCustomSettings[asd];
+        const asd = "detailed_" + TimeFrame.toLowerCase() + "s";
+        const ret = this.myCustomSettings[asd];
         return ret;
 
     }
@@ -156,8 +166,8 @@ class ObjectSettings {
         if (TimeFrame == "Minute" || TimeFrame == "Hour")
             return false;
 
-        let asd = "detailed_" + "current_" + TimeFrame.toLowerCase() + "s"
-        let ret = this.myCustomSettings[asd];
+        const asd = "detailed_" + "current_" + TimeFrame.toLowerCase() + "s";
+        const ret = this.myCustomSettings[asd];
         return ret;
 
     }

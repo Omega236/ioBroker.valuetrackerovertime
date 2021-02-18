@@ -152,7 +152,7 @@
 
 
 
-<button type="button" class="translate title collapsiblex">History readout (Experimental)</button>
+<button type="button" class="translate title collapsiblex">History readout (could override existing valuetrackerovertime-data (for this alias))</button>
 <div class="contentx">
     <div class="row">
 
@@ -160,7 +160,8 @@
             <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
             <span class="translate onlyinCustom">readout now</span>
             <input type="text" class="value " id="history_Instanz" data-field="history_Instanz" />
-            <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x
+            <span class="translate">Use the data from this history instance, these adapters should work: sql.x or
+                influxdb.x
                 or history.x</span>
         </div>
         <div class="col s3 input-field">
@@ -173,45 +174,66 @@
                 <span class="translate">fill befores</b></span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_startvalues" data-field="history_fill_startvalues" />
+                <input type="checkbox" class="value" id="history_fill_startvalues"
+                    data-field="history_fill_startvalues" />
                 <span class="translate">fill startvalues</b></span>
             </p>
         </div>
         <div class="col s6 input-field">
-            <p class="translate title">fill History</p>
+            <p class="translate title">fill History (store Data to the history-Adapter)</p>
             <p>
-                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value" id="history_fill_history_Instanz"
-                data-field="history_fill_history_Instanz" />
+                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value"
+                    id="history_fill_history_Instanz" data-field="history_fill_history_Instanz" />
                 <span class="translate">historywrite_Instanz</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_history_Day_enabled" data-field="history_fill_history_Day_enabled" />
+                <input type="checkbox" class="value" id="history_fill_history_Day_enabled"
+                    data-field="history_fill_history_Day_enabled" />
                 <span class="translate">01_current_Day</span>
-                <input type="number" class="value minDelta" id="history_fill_history_Day_MinChange" data-field="history_fill_history_Day_MinChange" />
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Day_MinChange"
+                    data-field="history_fill_history_Day_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_history_Week_enabled" data-field="history_fill_history_Week_enabled" />
+                <input type="checkbox" class="value" id="history_fill_history_Week_enabled"
+                    data-field="history_fill_history_Week_enabled" />
                 <span class="translate">02_current_Week</span>
-                <input type="number" class="value minDelta" id="history_fill_history_Week_MinChange" data-field="history_fill_history_Week_MinChange" />
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Week_MinChange"
+                    data-field="history_fill_history_Week_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_history_Month_enabled" data-field="history_fill_history_Month_enabled" />
+                <input type="checkbox" class="value" id="history_fill_history_Month_enabled"
+                    data-field="history_fill_history_Month_enabled" />
                 <span class="translate">03_current_Month</span>
-                <input type="number" class="value minDelta" id="history_fill_history_Month_MinChange" data-field="history_fill_history_Month_MinChange" />
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Month_MinChange"
+                    data-field="history_fill_history_Month_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_history_Quarter_enabled" data-field="history_fill_history_Quarter_enabled" />
+                <input type="checkbox" class="value" id="history_fill_history_Quarter_enabled"
+                    data-field="history_fill_history_Quarter_enabled" />
                 <span class="translate">04_current_Quarter</span>
-                <input type="number" class="value minDelta" id="history_fill_history_Quarter_MinChange" data-field="history_fill_history_Quarter_MinChange" />
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Quarter_MinChange"
+                    data-field="history_fill_history_Quarter_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
             <p>
-                <input type="checkbox" class="value" id="history_fill_history_Year_enabled" data-field="history_fill_history_Year_enabled" />
+                <input type="checkbox" class="value" id="history_fill_history_Year_enabled"
+                    data-field="history_fill_history_Year_enabled" />
                 <span class="translate">05_current_Year</span>
-                <input type="number" class="value minDelta"  id="history_fill_history_Year_MinChange" data-field="history_fill_history_Year_MinChange" />
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Year_MinChange"
+                    data-field="history_fill_history_Year_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
         </div>
@@ -248,27 +270,27 @@
     }
 
     .minDelta {
-        width:70px !important;
+        width: 70px !important;
         text-align: right;
     }
 
     /* Style the button that is used to open and close the collapsible content */
     .collapsiblex {
-      cursor: pointer;
-      width: calc(100% - 20px);
-      text-align: left;
-      outline: none;
+        cursor: pointer;
+        width: calc(100% - 20px);
+        text-align: left;
+        outline: none;
     }
-   
-   
+
+
     /* Style the collapsible content. Note: hidden by default */
     .contentx {
-      margin-right: 20px;
-      margin-bottom: 40px;
-      padding: 0 18px;
-      overflow: hidden;
-      background-color: #e1e1e1;
-      max-height:0;
-      transition: max-height 0.2s ease-out;
-    } 
+        margin-right: 20px;
+        margin-bottom: 40px;
+        padding: 0 18px;
+        overflow: hidden;
+        background-color: #e1e1e1;
+        max-height: 0;
+        transition: max-height 0.2s ease-out;
+    }
 </style>
