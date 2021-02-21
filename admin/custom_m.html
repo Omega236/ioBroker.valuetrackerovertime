@@ -1,6 +1,6 @@
-<script type="text/x-iobroker" data-template-name="valuetrackerovertime" >
-    
-    <div class="row">
+<script type="text/x-iobroker" data-template-name="valuetrackerovertime">
+
+<div class="row">
 	<div class="col s2">
 			<input type="checkbox" data-field="enabled"/>
 			<span class="translate">enabled</span>
@@ -22,6 +22,7 @@
 
 
 <!-- insert hier custom_m_h.html -->
+
 <p class=" translate title">Detailed history</p>
 <div class="row">
     <span class="translate">Create seperate datapoints for every timeframe (useful for users)</span>
@@ -73,7 +74,8 @@
 </div>
 <p class=" translate title">Detailed current</p>
 <div class="row">
-    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)</span>
+    <span class="translate">Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or
+        PowerUsageInDecember)</span>
 </div>
 <div class="row">
     <div class="col  input-field mytooltip">
@@ -113,7 +115,8 @@
 <p class=" translate title">Current / previous data</p>
 <div class="row">
     <div class="col mytooltip">
-        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
+        <span class="translate">-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes
+            before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear) </span>
         <span class="mytooltiptext">
             <span>example before >= 0: </span>
             <img src="/adapter/valuetrackerovertime/VTOT_Setting_Current.PNG" />
@@ -171,17 +174,97 @@
     </div>
 
 </div>
-<p class=" translate title">History readut (Experimental)</p>
-<div class="row">
-  <div class="col s3 input-field">
-    <input type="text" class="value" id="historyInstanz" data-field="historyInstanz" />
-    <span class="translate">Use the data from this history instance, these adapters should work: sql.x or influxdb.x or history.x</span>
-  </div>
-  <div class="col s3 input-field onlyinCustom">
-    <input type="checkbox" class="value" id="historyload_Detailed" data-field="historyload_Detailed" />
-    <span class="translate">Analyze history data after saving this settings. Datapoints will be filled with history data ("Detailed history", "Detailed current", "Previous data" and "start values") <b>Experimental (data in the valuetrackerovertime would be override)</b></span>
-  </div>
+
+
+
+<button type="button" class="translate title collapsiblex">History readout (could override existing valuetrackerovertime-data (for this alias))</button>
+<div class="contentx">
+    <div class="row">
+
+        <div class="col s3 input-field ">
+            <input type="checkbox" class="value onlyinCustom" id="history_work" data-field="history_work" />
+            <span class="translate onlyinCustom">readout now</span>
+            <input placeholder="Leave empty to use the defaultHistory" type="text" class="value " id="history_Instanz" data-field="history_Instanz" />
+            <span class="translate">Use the data from this history instance, these adapters should work: sql.x or
+                influxdb.x
+                or history.x</span>
+        </div>
+        <div class="col s3 input-field">
+            <p>
+                <input type="checkbox" class="value" id="history_fill_detailed" data-field="history_fill_detailed" />
+                <span class="translate">fill detailed</b></span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_before" data-field="history_fill_before" />
+                <span class="translate">fill befores</b></span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_startvalues"
+                    data-field="history_fill_startvalues" />
+                <span class="translate">fill startvalues</b></span>
+            </p>
+        </div>
+        <div class="col s6 input-field">
+            <p class="translate title">fill History (store Data to the history-Adapter)</p>
+            <p>
+                <input placeholder="Leave empty to use the history Read Instanz" type="text" class="value"
+                    id="history_fill_history_Instanz" data-field="history_fill_history_Instanz" />
+                <span class="translate">historywrite_Instanz</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_history_Day_enabled"
+                    data-field="history_fill_history_Day_enabled" />
+                <span class="translate">01_current_Day</span>
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Day_MinChange"
+                    data-field="history_fill_history_Day_MinChange" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_history_Week_enabled"
+                    data-field="history_fill_history_Week_enabled" />
+                <span class="translate">02_current_Week</span>
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Week_MinChange"
+                    data-field="history_fill_history_Week_MinChange" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_history_Month_enabled"
+                    data-field="history_fill_history_Month_enabled" />
+                <span class="translate">03_current_Month</span>
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Month_MinChange"
+                    data-field="history_fill_history_Month_MinChange" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_history_Quarter_enabled"
+                    data-field="history_fill_history_Quarter_enabled" />
+                <span class="translate">04_current_Quarter</span>
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Quarter_MinChange"
+                    data-field="history_fill_history_Quarter_MinChange" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+            <p>
+                <input type="checkbox" class="value" id="history_fill_history_Year_enabled"
+                    data-field="history_fill_history_Year_enabled" />
+                <span class="translate">05_current_Year</span>
+                <input type="number"
+                    title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                    class="value minDelta" id="history_fill_history_Year_MinChange"
+                    data-field="history_fill_history_Year_MinChange" />
+                <span class="translate">Delta to write HistoryEntry</span>
+            </p>
+        </div>
+    </div>
 </div>
+
 
 <style>
     .mytooltip {
@@ -208,59 +291,113 @@
 
     .mytooltip:hover .mytooltiptext {
         visibility: visible;
-        transition-delay:0.3s;
+        transition-delay: 0.3s;
+    }
+
+    .minDelta {
+        width: 70px !important;
+        text-align: right;
+    }
+
+    /* Style the button that is used to open and close the collapsible content */
+    .collapsiblex {
+        cursor: pointer;
+        width: calc(100% - 20px);
+        text-align: left;
+        outline: none;
+    }
+
+
+    /* Style the collapsible content. Note: hidden by default */
+    .contentx {
+        margin-right: 20px;
+        margin-bottom: 40px;
+        padding: 0 18px;
+        overflow: hidden;
+        background-color: #e1e1e1;
+        max-height: 0;
+        transition: max-height 0.2s ease-out;
     }
 </style>
-
-
 </script>
 
 
 <script type="text/javascript">
-          
-
- $.get("adapter/valuetrackerovertime/words.js", function (script) {
-    let translation = script.substring(script.indexOf('{'), script.length);
-    translation = translation.substring(0, translation.lastIndexOf(';'));
-    $.extend(systemDictionary, JSON.parse(translation));
-  });
 
 
 
+    $.get("adapter/valuetrackerovertime/words.js", function (script) {
+        let translation = script.substring(script.indexOf('{'), script.length);
+        translation = translation.substring(0, translation.lastIndexOf(';'));
+        $.extend(systemDictionary, JSON.parse(translation));
+    });
+    // Shorthand for $( document ).ready()
+    $(function () {
+        var coll = document.getElementsByClassName("collapsiblex");
+        var i;
 
-  // There are two ways how to predefine default settings:
-  // - with attribute "data-default" (content independent)
-  // - with function in global variable "defaults". Function name is equal with adapter name.
-  //   as input function receives object with all information concerning it
-  if (typeof defaults !== 'undefined') {
-    defaults["valuetrackerovertime"] = function (obj, instanceObj) {
-      return {
-        enabled: false,
-        alias: null,
-        output_unit: null,
-        output_multiplier: 1,
-        detailed_days: instanceObj.native.detailed_days,
-        detailed_weeks: instanceObj.native.detailed_weeks,
-        detailed_months: instanceObj.native.detailed_months,
-        detailed_years: instanceObj.native.detailed_years,
-        detailed_current_days: instanceObj.native.detailed_current_days,
-        detailed_current_weeks: instanceObj.native.detailed_current_weeks,
-        detailed_current_months: instanceObj.native.detailed_current_months,
-        detailed_current_quarters: instanceObj.native.detailed_current_quarters,
-        before_minutes: instanceObj.native.before_minutes,
-        before_hours: instanceObj.native.before_hours,
-        before_days: instanceObj.native.before_days,
-        before_weeks: instanceObj.native.before_weeks,
-        before_months: instanceObj.native.before_months,
-        before_quarters: instanceObj.native.before_quarters,
-        before_years: instanceObj.native.before_years,
-        counterResetDetection: instanceObj.native.counterResetDetection,
-        counterResetDetetion_CountAfterReset: instanceObj.native.counterResetDetetion_CountAfterReset,
-        historyInstanz: instanceObj.native.historyInstanz,
-        historyload_Detailed: false
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
+    });
 
 
-      };
+
+
+
+    // There are two ways how to predefine default settings:
+    // - with attribute "data-default" (content independent)
+    // - with function in global variable "defaults". Function name is equal with adapter name.
+    //   as input function receives object with all information concerning it
+    if (typeof defaults !== 'undefined') {
+        defaults["valuetrackerovertime"] = function (obj, instanceObj) {
+            return {
+                enabled: false,
+                alias: null,
+                output_unit: null,
+                output_multiplier: 1,
+                detailed_days: instanceObj.native.detailed_days,
+                detailed_weeks: instanceObj.native.detailed_weeks,
+                detailed_months: instanceObj.native.detailed_months,
+                detailed_years: instanceObj.native.detailed_years,
+                detailed_current_days: instanceObj.native.detailed_current_days,
+                detailed_current_weeks: instanceObj.native.detailed_current_weeks,
+                detailed_current_months: instanceObj.native.detailed_current_months,
+                detailed_current_quarters: instanceObj.native.detailed_current_quarters,
+                before_minutes: instanceObj.native.before_minutes,
+                before_hours: instanceObj.native.before_hours,
+                before_days: instanceObj.native.before_days,
+                before_weeks: instanceObj.native.before_weeks,
+                before_months: instanceObj.native.before_months,
+                before_quarters: instanceObj.native.before_quarters,
+                before_years: instanceObj.native.before_years,
+                counterResetDetection: instanceObj.native.counterResetDetection,
+                counterResetDetetion_CountAfterReset: instanceObj.native.counterResetDetetion_CountAfterReset,
+                history_work: false,
+                history_Instanz: instanceObj.native.history_Instanz,
+                history_fill_detailed: instanceObj.native.history_fill_detailed,
+                history_fill_before: instanceObj.native.history_fill_before,
+                history_fill_startvalues: instanceObj.native.history_fill_startvalues,
+                history_fill_history_Instanz: instanceObj.native.history_fill_history_Instanz,
+                history_fill_history_Day_enabled: instanceObj.native.history_fill_history_Day_enabled,
+                history_fill_history_Day_MinChange: instanceObj.native.history_fill_history_Day_MinChange,
+                history_fill_history_Week_enabled: instanceObj.native.history_fill_history_Week_enabled,
+                history_fill_history_Week_MinChange: instanceObj.native.history_fill_history_Week_MinChange,
+                history_fill_history_Month_enabled: instanceObj.native.history_fill_history_Month_enabled,
+                history_fill_history_Month_MinChange: instanceObj.native.history_fill_history_Month_MinChange,
+                history_fill_history_Quarter_enabled: instanceObj.native.history_fill_history_Quarter_enabled,
+                history_fill_history_Quarter_MinChange: instanceObj.native.history_fill_history_Quarter_MinChange,
+                history_fill_history_Year_enabled: instanceObj.native.history_fill_history_Year_enabled,
+                history_fill_history_Year_MinChange: instanceObj.native.history_fill_history_Year_MinChange
+            };
+        }
     }
-  }
 </script>

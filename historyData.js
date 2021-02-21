@@ -13,7 +13,7 @@ class historyData {
                 ts = new Date(ts);
             }
         }
-        this.hisval = val;
+        this.val = val;
         this.date = ts;
     }
 

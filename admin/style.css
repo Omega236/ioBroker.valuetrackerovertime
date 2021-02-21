@@ -28,4 +28,4 @@ label > i[title] {
     /* Don't wrap text in dropdowns */
     white-space: nowrap;
 }
-.onlyinCustom{ display:none; }
+.onlyinCustom{ display:none !important; }
