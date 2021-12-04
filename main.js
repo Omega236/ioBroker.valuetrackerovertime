@@ -201,7 +201,7 @@ class valuetrackerovertime extends utils.Adapter {
             await this._setMyObject(id, objectschannels[id]);
         }
 
-        const objectView = await this.getObjectViewAsync("custom", "state", null);
+        const objectView = await this.getObjectViewAsync("system", "custom", null);
         if (objectView && objectView.rows) {
             for (const counterObjectView in objectView.rows) {
                 const oneObjectview = objectView.rows[counterObjectView];
