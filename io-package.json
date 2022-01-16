@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.6.0",
+        "version": "0.6.1",
         "news": {
+            "0.6.1": {
+                "en": "basic Admin 5 support",
+                "de": "grundlegende Admin 5-Unterstützung",
+                "ru": "базовая поддержка администратора 5",
+                "pt": "suporte básico ao administrador 5",
+                "nl": "basis Admin 5 ondersteuning",
+                "fr": "prise en charge de base d'Admin 5",
+                "it": "supporto di base per l'amministratore 5",
+                "es": "Soporte básico de administrador 5",
+                "pl": "podstawowe wsparcie Admina 5",
+                "zh-cn": "基本的 Admin 5 支持"
+            },
             "0.6.0": {
                 "en": "add function to store history-Data to current-DP history",
                 "de": "Funktion zum Speichern von Verlaufsdaten zum aktuellen DP-Verlauf hinzufügen",
@@ -25,7 +37,8 @@
                 "it": "ottimizzare l'utilizzo della RAM (rimuovere .toLocaleString)",
                 "es": "optimizar el uso de RAM (eliminar .toLocaleString)",
                 "pl": "optymalizuj użycie pamięci RAM (Usuń .toLocaleString)",
-                "zh-cn": "优化RAM的使用（删除.toLocaleString）"            },
+                "zh-cn": "优化RAM的使用（删除.toLocaleString）"
+            },
             "0.5.3": {
                 "en": "bugfix startvalue not used after SQL read out",
                 "de": "Bugfix-Startwert wird nach dem Auslesen von SQL nicht verwendet",
@@ -36,7 +49,8 @@
                 "it": "bugfix startvalue non utilizzato dopo la lettura di SQL",
                 "es": "corrección de errores valor inicial no utilizado después de la lectura de SQL",
                 "pl": "bugfix startvalue nie używany po odczytaniu SQL",
-                "zh-cn": "SQL读出后未使用错误修正起始值"            },
+                "zh-cn": "SQL读出后未使用错误修正起始值"
+            },
             "0.5.2": {
                 "en": "bugfix _getObjectAsync not worked",
                 "de": "Bugfix _getObjectAsync hat nicht funktioniert",
@@ -47,7 +61,8 @@
                 "it": "bugfix _getObjectAsync non funzionava",
                 "es": "corrección de error _getObjectAsync no funcionó",
                 "pl": "bugfix _getObjectAsync nie działał",
-                "zh-cn": "错误修正_getObjectAsync不起作用"            },
+                "zh-cn": "错误修正_getObjectAsync不起作用"
+            },
             "0.5.1": {
                 "en": "optimizations, HistoryAnalyse extended and CurrentHistory added",
                 "de": "Optimierungen, HistoryAnalyse erweitert und CurrentHistory hinzugefügt",
@@ -58,7 +73,8 @@
                 "it": "ottimizzazioni, HistoryAnalyse esteso e CurrentHistory aggiunto",
                 "es": "optimizaciones, HistoryAnalyse extendido y CurrentHistory agregado",
                 "pl": "optymalizacje, rozszerzenie HistoryAnalyse i dodane CurrentHistory",
-                "zh-cn": "优化，扩展了HistoryAnalyse并添加了CurrentHistory"            },
+                "zh-cn": "优化，扩展了HistoryAnalyse并添加了CurrentHistory"
+            },
             "0.4.1": {
                 "en": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi",
                 "de": "Bugfix DetailedYear nicht gespeichert, Bugfix HistoryDetailed nicht verwendet Multi",
@@ -69,7 +85,8 @@
                 "it": "bugfix DetailedAnno non salvato, bugfix HistoryDetailed non utilizzato Multi",
                 "es": "corrección de errores Detallada Año no guardado, corrección de errores Historial Detallado no utilizado Multi",
                 "pl": "poprawka szczegółowa Rok nie została zapisana, naprawa błędów Historia Szczegółowa nie używana Wiele",
-                "zh-cn": "错误修正DetailedYear未保存，错误修正HistoryDetailed未使用多"            },
+                "zh-cn": "错误修正DetailedYear未保存，错误修正HistoryDetailed未使用多"
+            },
             "0.4.0": {
                 "en": "HistoryAnalyseDetailed Added, Bugfix KW",
                 "de": "HistoryAnalyseDetailed Hinzugefügt, Bugfix KW",
@@ -80,7 +97,8 @@
                 "it": "HistoryAnalyseDetailed Added, Bugfix KW",
                 "es": "Historial AnalizarDetallado agregado, corrección de errores KW",
                 "pl": "HistoryAnalyseDetailed Dodano, Bugfix KW",
-                "zh-cn": "历史分析详细已添加，错误修正KW"            },
+                "zh-cn": "历史分析详细已添加，错误修正KW"
+            },
             "0.3.5": {
                 "en": "reset Detection optimize and bugfix only ack",
                 "de": "Zurücksetzen Erkennung optimieren und Bugfix nur bestätigen",
@@ -91,7 +109,8 @@
                 "it": "reset Ottimizzazione del rilevamento e correzione dei bug solo ack",
                 "es": "reiniciar Detección optimizar y corregir errores solo ack",
                 "pl": "resetuj Wykrywanie optymalizuj i naprawiaj tylko potwierdzenie",
-                "zh-cn": "重置检测优化和错误修正仅确认"            },
+                "zh-cn": "重置检测优化和错误修正仅确认"
+            },
             "0.3.4": {
                 "en": "Check for duplicate Alias and reduce recalcs on start-value changed",
                 "de": "Suchen Sie nach doppeltem Alias und reduzieren Sie die Neuberechnungen bei geändertem Startwert",
@@ -102,7 +121,8 @@
                 "it": "Verificare la presenza di alias duplicati e ridurre i ricalcoli al valore iniziale modificato",
                 "es": "Compruebe si hay un alias duplicado y reduzca las recalcificaciones en el valor inicial cambiado",
                 "pl": "Sprawdź, czy nie ma zduplikowanych aliasów i zmniejsz liczbę przeliczeń przy zmianie wartości początkowej",
-                "zh-cn": "检查重复的别名并减少更改后的起始值的重新计算"            },
+                "zh-cn": "检查重复的别名并减少更改后的起始值的重新计算"
+            },
             "0.3.3": {
                 "en": "bugfix date object changed",
                 "de": "Bugfix-Datumsobjekt geändert",
@@ -113,7 +133,8 @@
                 "it": "oggetto data bugfix modificato",
                 "es": "objeto de fecha de corrección de errores cambiado",
                 "pl": "Zmieniono obiekt daty naprawy błędu",
-                "zh-cn": "错误修正日期对象已更改"            },
+                "zh-cn": "错误修正日期对象已更改"
+            },
             "0.3.2": {
                 "en": "remove selectID.js in index_m.html",
                 "de": "Entfernen Sie selectID.js in index_m.html",
@@ -124,7 +145,8 @@
                 "it": "rimuovere selectID.js in index_m.html",
                 "es": "eliminar selectID.js en index_m.html",
                 "pl": "usuń selectID.js w index_m.html",
-                "zh-cn": "删除index_m.html中的selectID.js"            },
+                "zh-cn": "删除index_m.html中的selectID.js"
+            },
             "0.3.1": {
                 "en": "first public",
                 "de": "erste Öffentlichkeit",
@@ -135,7 +157,8 @@
                 "it": "primo pubblico",
                 "es": "primer publico",
                 "pl": "pierwsze publiczne",
-                "zh-cn": "首次公开"            },
+                "zh-cn": "首次公开"
+            },
             "0.0.1": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
@@ -224,7 +247,7 @@
         "before_quarters": 4,
         "before_years": 3,
         "counterResetDetection": true,
-        "counterResetDetetion_CountAfterReset":1,
+        "counterResetDetetion_CountAfterReset": 1,
         "history_Instanz": "",
         "history_fill_detailed": true,
         "history_fill_before": true,
@@ -241,6 +264,6 @@
         "history_fill_history_Year_enabled": false,
         "history_fill_history_Year_MinChange": 0
     },
-  "objects": [],
-  "instanceObjects": []
+    "objects": [],
+    "instanceObjects": []
 }
