@@ -1,0 +1,329 @@
+{
+    "i18n": {
+        
+    },
+    "type": "panel",
+    "items": {
+        "alias": {
+            "newLine": true,
+            "type": "text",
+            "label": "alias",
+            "help": "Leave empty to use object's name",
+            "sm": 6,
+            "default": ""
+        },
+        "output_unit": {
+            "type": "text",
+            "label": "output unit",
+            "help": "Leave empty to use object's unit",
+            "sm": 3,
+            "default": ""
+        },
+        "output_multiplier": {
+            "type": "number",
+            "label": "output Multiplier",
+            "sm": 3,
+            "default": 1
+        },
+        "_header_Detailed_history": {
+            "newLine": true,
+            "type": "header",
+            "text": "Detailed history",
+            "size": 3,
+            "sm": 12
+        },
+        "_info_Detailed_history": {
+            "newLine": true,
+            "type": "staticText",
+            "label": "Create seperate datapoints for every timeframe (useful for admin ui)"
+        },
+        "detailed_days": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "Every day",
+            "help": "(~365 datapoints per year)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_days",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_DetailedDays.PNG"
+        },
+        "detailed_weeks": {
+            "type": "checkbox",
+            "label": "Every week",
+            "help": "(~53 datapoints per year)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_weeks",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_DetailedWeeks.PNG"
+        },
+        "detailed_months": {
+            "type": "checkbox",
+            "label": "Every month",
+            "help": "(12 datapoints per year)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_months",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_DetailedMonths.PNG"
+        },
+        "detailed_quarters": {
+            "type": "checkbox",
+            "label": "Every quarter",
+            "help": "(4 datapoints per year)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_quarters",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_DetailedQuarters.PNG"
+        },
+        "detailed_years": {
+            "type": "checkbox",
+            "label": "Every year",
+            "help": "(1 datapoints per year)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_years",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_DetailedYears.PNG"
+        },
+        "_header_Detailed_current": {
+            "newLine": true,
+            "type": "header",
+            "text": "Detailed current",
+            "size": 3,
+            "sm": 12
+        },
+        "_info_Detailed_current": {
+            "newLine": true,
+            "type": "staticText",
+            "label": "Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)"
+        },
+        "detailed_current_days": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "Weekdays Mo-Su",
+            "help": "(7 datapoints)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_current_days",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_detailed_current_days.PNG"
+        },
+        "detailed_current_weeks": {
+            "type": "checkbox",
+            "label": "Weeks in the last 12 months",
+            "help": "(~53 datapoints)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_current_weeks",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_detailed_current_weeks.PNG"
+        },
+        "detailed_current_months": {
+            "type": "checkbox",
+            "label": "Months in the last 12 months",
+            "help": "(12 datapoints)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_current_months",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_detailed_current_months.PNG"
+        },
+        "detailed_current_quarters": {
+            "type": "checkbox",
+            "label": "quarters in the last 12 months",
+            "help": "(4 datapoints)",
+            "sm": 4,
+            "defaultFunc": "instanceObj.native.detailed_current_quarters",
+            "helpLink": "/adapter/valuetrackerovertime/VTOT_Setting_detailed_current_quarters.PNG"
+        },
+        "_header_current_previous_data": {
+            "newLine": true,
+            "type": "header",
+            "text": "Current / previous data",
+            "size": 3,
+            "sm": 12
+        },
+        "_info_current_previous_data": {
+            "newLine": true,
+            "type": "staticText",
+            "label": "-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear)"
+        },
+        "_sample_current_data": {
+            "newLine": true,
+            "type": "staticLink",
+            "label": "sample Datapoints if value >= 0",
+            "href": "/adapter/valuetrackerovertime/VTOT_Setting_Current.PNG",
+            "button": true,
+            "sm": 3
+        },
+        "_sample_before_data": {
+            "type": "staticLink",
+            "label": "sample Datapoints if value >= 1",
+            "href": "/adapter/valuetrackerovertime/VTOT_Setting_Before.png",
+            "button": true,
+            "sm": 3
+        },
+        "before_minutes": {
+            "newLine": true,
+            "type": "number",
+            "label": "Keep previous minutes",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_minutes"
+        },
+        "before_hours": {
+            "type": "number",
+            "label": "Keep previous hours",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_hours"
+        },
+        "before_days": {
+            "newLine": true,
+            "type": "number",
+            "label": "Keep previous days",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_days"
+        },
+        "before_weeks": {
+            "type": "number",
+            "label": "Keep previous weeks",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_weeks"
+        },
+        "before_months": {
+            "type": "number",
+            "label": "Keep previous months",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_months"
+        },
+        "before_quarters": {
+            "type": "number",
+            "label": "Keep previous quarters",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_quarters"
+        },
+        "before_years": {
+            "type": "number",
+            "label": "Keep previous years",
+            "sm": 2,
+            "defaultFunc": "instanceObj.native.before_years"
+        },
+        "_header_historyReadout": {
+            "newLine": true,
+            "type": "header",
+            "text": "History readout (could override existing valuetrackerovertime-data (for this alias))",
+            "size": 3,
+            "sm": 12
+        },
+        "_info_historyReadout": {
+            "newLine": true,
+            "type": "staticText",
+            "label": ""
+        },
+        "history_work": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "readout now",
+            "sm": 12,
+            "default": false
+        },
+        "history_Instanz": {
+            "newLine": true,
+            "type": "text",
+            "label": "History Instanz",
+            "sm": 12,
+            "hidden": "!data.history_work",
+            "placeholder": "Leave empty to use the defaultHistory",
+            "help": "Use the data from this history instance, these adapters should work: sql.x or influxdb.x or history.x"
+        },
+        "history_fill_detailed": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "fill detailed",
+            "sm": 4,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_before": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "fill before",
+            "sm": 4,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_startvalues": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "fill startvalues",
+            "sm": 4,
+            "hidden": "!data.history_work"
+        },
+        "_header_historyFillHistory": {
+            "newLine": true,
+            "type": "header",
+            "text": "fill History (store Data to the history-Adapter)",
+            "size": 1,
+            "sm": 12,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Instanz": {
+            "newLine": true,
+            "type": "text",
+            "label": "History fill Instanz",
+            "sm": 12,
+            "hidden": "!data.history_work",
+            "placeholder": "Leave empty to use the defaultHistory",
+            "help": "write history-Data for the datapoints"
+        },
+        "history_fill_history_Day_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "01_current_Day",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Day_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Day_enabled"
+        },
+        "history_fill_history_Week_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "02_current_Week",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Week_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Week_enabled"
+        },
+        "history_fill_history_Month_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "03_current_Month",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Month_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Month_enabled"
+        },
+        "history_fill_history_Quarter_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "04_current_Quarter",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Quarter_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Quarter_enabled"
+        },
+        "history_fill_history_Year_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "05_current_Year",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Year_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Year_enabled"
+        }
+    }
+}
