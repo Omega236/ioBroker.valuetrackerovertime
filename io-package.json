@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.6.1",
+        "version": "0.6.2",
         "news": {
+            "0.6.2": {
+                "en": "counterResetDetection was missing in customjson",
+                "de": "counterResetDetection fehlte in customjson",
+                "ru": "counterResetDetection отсутствовал в customjson",
+                "pt": "counterResetDetection estava faltando no customjson",
+                "nl": "counterResetDetection ontbrak in customjson",
+                "fr": "counterResetDetection manquait dans customjson",
+                "it": "counterResetDetection mancava in customjson",
+                "es": "counterResetDetection faltaba en customjson",
+                "pl": "W customjson brakowało counterResetDetection",
+                "zh-cn": "customjson 中缺少 counterResetDetection"
+            },
             "0.6.1": {
                 "en": "basic Admin 5 support",
                 "de": "grundlegende Admin 5-Unterstützung",
