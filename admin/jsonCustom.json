@@ -194,6 +194,26 @@
             "sm": 2,
             "defaultFunc": "instanceObj.native.before_years"
         },
+        "_header_Counter_reset_detection": {
+            "newLine": true,
+            "type": "header",
+            "text": "Counter reset detection",
+            "size": 3,
+            "sm": 12
+        },
+        "counterResetDetection": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "enable counter reset detection",
+            "sm": 3,
+            "defaultFunc": "instanceObj.native.counterResetDetection"
+        },
+        "counterResetDetetion_CountAfterReset": {
+            "type": "number",
+            "label": "Ignore values (count) lower then the last good value",
+            "sm": 9,
+            "defaultFunc": "instanceObj.native.counterResetDetetion_CountAfterReset"
+        },
         "_header_historyReadout": {
             "newLine": true,
             "type": "header",
