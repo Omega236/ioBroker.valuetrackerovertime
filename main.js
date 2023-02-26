@@ -1255,7 +1255,8 @@ class valuetrackerovertime extends utils.Adapter {
 
 }
 
-
+try {
+ 
 // @ts-ignore parent is a valid property on module
 if (module.parent) {
   // Export the constructor in compact mode
@@ -1266,4 +1267,10 @@ if (module.parent) {
 } else {
   // otherwise start the instance directly
   new valuetrackerovertime();
+}
+
+} catch (error) {
+  console.error(error);
+  // Expected output: ReferenceError: nonExistentFunction is not defined
+  // (Note: the exact output may be browser-dependent)
 }
