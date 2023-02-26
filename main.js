@@ -114,7 +114,13 @@ class valuetrackerovertime extends utils.Adapter {
    * @param {ioBroker.Object | null | undefined} obj
    */
   async onObjectChange(id, obj) {
-    await this._initialObject(obj);
+ try {
+  await this._initialObject(obj);
+} catch (error) {
+  console.error("abc2" + error);
+  // Expected output: ReferenceError: nonExistentFunction is not defined
+  // (Note: the exact output may be browser-dependent)
+}  
   }
 
   /**
@@ -123,6 +129,8 @@ class valuetrackerovertime extends utils.Adapter {
    * @param {ioBroker.State | null | undefined} state
    */
   async onStateChange(id, state) {
+     try {
+ 
     if (state) {
       if (id in this.dicDatas) {
         await this._publishCurrentValue(this.dicDatas[id], new Date(state.ts), await this._getNumberfromState(state));
@@ -147,6 +155,11 @@ class valuetrackerovertime extends utils.Adapter {
 
       }
     }
+} catch (error) {
+  console.error("abc2" + error);
+  // Expected output: ReferenceError: nonExistentFunction is not defined
+  // (Note: the exact output may be browser-dependent)
+}  
 
   }
 
