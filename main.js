@@ -72,33 +72,39 @@ class valuetrackerovertime extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
+    try {
 
-    await this.subscribeForeignObjectsAsync("*");
-    await this.initialObjects();
-    this.crons.push(cron.schedule("* * * * *", async () => {
-      await this._timeFrameFinished(TimeFrames.Minute);
-    }));
-    this.crons.push(cron.schedule("0 * * * *", async () => {
-      await this._timeFrameFinished(TimeFrames.Hour);
-    }));
-    this.crons.push(cron.schedule("0 0 * * *", async () => {
-      await this._timeFrameFinished(TimeFrames.Day);
-    }));
-    this.crons.push(cron.schedule("0 0 * * 1", async () => {
-      await this._timeFrameFinished(TimeFrames.Week);
-    }));
-    this.crons.push(cron.schedule("0 0 1 * *", async () => {
-      await this._timeFrameFinished(TimeFrames.Month);
-    }));
-    this.crons.push(cron.schedule("0 0 1 */3 *", async () => {
-      await this._timeFrameFinished(TimeFrames.Quarter);
-    }));
-    this.crons.push(cron.schedule("0 0 1 1 *", async () => {
-      await this._timeFrameFinished(TimeFrames.Year);
-    }));
-    this.crons.push(cron.schedule("0 0 1 1 *", async () => {
-      //await this._timeFrameFinished(TimeFrames.Infinite);
-    }));
+
+        await this.subscribeForeignObjectsAsync("*");
+        await this.initialObjects();
+        this.crons.push(cron.schedule("* * * * *", async () => {
+          await this._timeFrameFinished(TimeFrames.Minute);
+        }));
+        this.crons.push(cron.schedule("0 * * * *", async () => {
+          await this._timeFrameFinished(TimeFrames.Hour);
+        }));
+        this.crons.push(cron.schedule("0 0 * * *", async () => {
+          await this._timeFrameFinished(TimeFrames.Day);
+        }));
+        this.crons.push(cron.schedule("0 0 * * 1", async () => {
+          await this._timeFrameFinished(TimeFrames.Week);
+        }));
+        this.crons.push(cron.schedule("0 0 1 * *", async () => {
+          await this._timeFrameFinished(TimeFrames.Month);
+        }));
+        this.crons.push(cron.schedule("0 0 1 */3 *", async () => {
+          await this._timeFrameFinished(TimeFrames.Quarter);
+        }));
+        this.crons.push(cron.schedule("0 0 1 1 *", async () => {
+          await this._timeFrameFinished(TimeFrames.Year);
+        }));
+        this.crons.push(cron.schedule("0 0 1 1 *", async () => {
+          //await this._timeFrameFinished(TimeFrames.Infinite);
+        }));
+    } catch (error) {
+      console.error("abc:" + error);
+    }
+
 
   }
 
