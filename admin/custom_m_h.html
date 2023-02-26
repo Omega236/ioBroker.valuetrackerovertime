@@ -236,6 +236,16 @@
                     data-field="history_fill_history_Year_MinChange" />
                 <span class="translate">Delta to write HistoryEntry</span>
             </p>
+            <p>
+              <input type="checkbox" class="value" id="history_fill_history_Infinite_enabled"
+                  data-field="history_fill_history_Infinite_enabled" />
+              <span class="translate">06_current_Infinite</span>
+              <input type="number"
+                  title="0 = read the delta from the custom of the DP &#10;bigger values means less history entrys &#10;TimeFrame beginning and ending allways write to history&#10;store history-entrys takes much time (~ 0.01s per entry) so be carefull and store not to many entrys "
+                  class="value minDelta" id="history_fill_history_Infinite_MinChange"
+                  data-field="history_fill_history_Infinite_MinChange" />
+              <span class="translate">Delta to write HistoryEntry</span>
+          </p>
         </div>
     </div>
 </div>

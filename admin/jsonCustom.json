@@ -344,6 +344,19 @@
             "label": "Delta to write HistoryEntry",
             "sm": 4,
             "hidden": "!data.history_fill_history_Year_enabled"
+        },
+        "history_fill_history_Infinite_enabled": {
+            "newLine": true,
+            "type": "checkbox",
+            "label": "06_current_Infinite",
+            "sm": 3,
+            "hidden": "!data.history_work"
+        },
+        "history_fill_history_Infinite_MinChange": {
+            "type": "number",
+            "label": "Delta to write HistoryEntry",
+            "sm": 4,
+            "hidden": "!data.history_fill_history_Infinite_enabled"
         }
     }
 }

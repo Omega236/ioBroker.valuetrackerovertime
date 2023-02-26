@@ -51,7 +51,7 @@ let abc = UrDP._id.split('.')
 
 let SA_ID = 'sourceanalytix.0.' + abc.join('__') + '.consumption' 
 
-const TimeFrames = {
+const TimeFramesx = {
     Day: "Day",
     Week: "Week",
     Month: "Month",
@@ -60,7 +60,7 @@ const TimeFrames = {
 };
 let zahler = 0
 //SQL für DPs aktivieren
-for (let oneTimeFrame in TimeFrames){
+for (let oneTimeFrame in TimeFramesx){
 
     console.log('Übernehme SQL Settings aus den Sourceanalytics-Datenpunkte für ' + oneTimeFrame)
     zahler ++
@@ -97,7 +97,7 @@ console.log('Alle SQL Einstellungen übernommen, warte 10 Sekunden für Ids in D
 
 await wait(20000)
 
-for (let oneTimeFrame in TimeFrames){
+for (let oneTimeFrame in TimeFramesx){
     zahler ++
     let SACurrentID = SA_ID + '.0' + zahler + '_current_' + oneTimeFrame.toLowerCase()
     
