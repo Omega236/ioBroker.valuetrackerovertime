@@ -50,16 +50,6 @@ interface ioBrokerSocket {
     ): void;
 
     emit(
-        event: "getObjectView",
-        view: "system",
-        type: "device",
-        options: ioBroker.GetObjectViewParams,
-        callback: (
-            err: string | undefined,
-            result?: any,
-        ) => void | Promise<void>,
-    ): void;
-    emit(
         event: "getStates",
         callback: (
             err: string | undefined,
