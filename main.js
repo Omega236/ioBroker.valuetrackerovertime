@@ -693,6 +693,7 @@ class valuetrackerovertime extends utils.Adapter {
       mydetailedObjectId = "." + date.getFullYear();
       await this._setExtendChannel(oS, mydetailedObjectId, String(date.getFullYear()), true);
       if (TimeFrame == TimeFrames.Infinite) {
+        //nothing to do
       }
       else if (TimeFrame == TimeFrames.Year) {
         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Year, date);

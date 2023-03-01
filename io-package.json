@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "0.6.2",
+        "version": "1.0.0",
         "news": {
             "1.0.0": {
                 "en": "Final version 1.0.0 with Infinite Counter",
@@ -214,15 +214,15 @@
         },
         "titleLang": {
             "en": "ValueTrackerOverTime",
-            "de": "WerttrackerOverTime",
+            "de": "ValueTrackerOverTime",
             "ru": "ValueTrackerOverTime",
-            "pt": "Tempo de entrega",
-            "nl": "ValueTrackerOverTim",
+            "pt": "ValueTrackerOverTime",
+            "nl": "ValueTrackerOverTime",
             "fr": "ValueTrackerOverTime",
-            "it": "ValueTrackerOvertime",
+            "it": "ValueTrackerOverTime",
             "es": "ValueTrackerOverTime",
-            "pl": "ValueTrackerOverTime (ang.)",
-            "uk": "Огляд Довідка",
+            "pl": "ValueTrackerOverTime",
+            "uk": "ValueTrackerOverTime",
             "zh-cn": "价值营商"
         },
         "desc": {
