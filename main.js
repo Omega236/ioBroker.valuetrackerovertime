@@ -186,7 +186,7 @@ class valuetrackerovertime extends utils.Adapter {
    * @returns {Promise<number>}
    */
   async _getNumberfromState(State) {
-    if (State && State.val && Number(State.val) != Number.NaN) {
+    if (State && State.val && !isNaN(Number(State.val))) {
       return Number(State.val);
     }
     return 0;
@@ -893,7 +893,7 @@ class valuetrackerovertime extends utils.Adapter {
       await this._setExtendObject(oS, startID, "start_" + TimeFrame, "", true, true, oS.iobrokerObject.common.unit, "number");
       //set startData if not set
       const state = await this.getStateAsync(oS.alias + startID);
-      if (state && state.val != null && Number(state.val) != Number.NaN) {
+      if (state && state.val != null && !isNaN(Number(state.val))) {
         oS.startValues[TimeFrame] = Number(state.val);
       }
       else {
