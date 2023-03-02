@@ -27,6 +27,11 @@
     "@iobroker/adapter-core": "^2.6.7",
     "node-cron": "^2.0.3"
   },
+  "globalDependencies": [
+    {
+      "admin": ">=5.0.0"
+    }
+  ],
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
