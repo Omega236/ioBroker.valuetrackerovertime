@@ -1,46 +1,47 @@
 {
-    "cli": true,
-    "adapterName": "valuetrackerovertime",
-    "title": "Value-Tracker over time",
-    "description": "Tracks number-changes over timepsans like hours/days/years ...",
-    "keywords": [
-        "Tracker",
-        "statistic",
-        "history",
-        "ioBroker",
-        "log data"
-    ],
-    "contributors": [
-        "MadKombat"
-    ],
-    "expert": "yes",
-    "features": [
-        "adapter"
-    ],
-    "adminFeatures": [
-        "custom"
-    ],
-    "type": "storage",
-    "startMode": "daemon",
-    "connectionType": "local",
-    "dataSource": "poll",
-    "connectionIndicator": "no",
-    "language": "JavaScript",
-    "adminReact": "no",
-    "tools": [
-        "ESLint",
-        "type checking"
-    ],
-    "indentation": "Space (4)",
-    "quotes": "double",
-    "es6class": "yes",
-    "authorName": "Omega236",
-    "authorGithub": "Omega236",
-    "authorEmail": "general.of.omega@googlemail.com",
-    "gitRemoteProtocol": "HTTPS",
-    "gitCommit": "yes",
-    "license": "MIT License",
-    "ci": "travis",
-    "dependabot": "yes",
-    "creatorVersion": "1.31.0"
+  "cli": true,
+  "adapterName": "valuetrackerovertime",
+  "title": "Value-Tracker over time",
+  "description": "Tracks number-changes over timepsans like hours/days/years ...",
+  "keywords": [
+    "Tracker",
+    "statistic",
+    "history",
+    "ioBroker",
+    "log data"
+  ],
+  "contributors": [
+    "MadKombat"
+  ],
+  "expert": "yes",
+  "features": [
+    "adapter"
+  ],
+  "adminFeatures": [
+    "custom",
+    "config"
+  ],
+  "type": "storage",
+  "startMode": "daemon",
+  "connectionType": "local",
+  "dataSource": "poll",
+  "connectionIndicator": "no",
+  "language": "JavaScript",
+  "adminReact": "no",
+  "tools": [
+    "ESLint",
+    "type checking"
+  ],
+  "indentation": "Space (4)",
+  "quotes": "double",
+  "es6class": "yes",
+  "authorName": "Omega236",
+  "authorGithub": "Omega236",
+  "authorEmail": "general.of.omega@googlemail.com",
+  "gitRemoteProtocol": "HTTPS",
+  "gitCommit": "yes",
+  "license": "MIT License",
+  "ci": "travis",
+  "dependabot": "yes",
+  "creatorVersion": "1.31.0"
 }

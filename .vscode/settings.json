@@ -1,5 +1,5 @@
 {
     "eslint.enable": true,
     "editor.insertSpaces": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 2
 }

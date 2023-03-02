@@ -186,7 +186,7 @@ class valuetrackerovertime extends utils.Adapter {
    * @returns {Promise<number>}
    */
   async _getNumberfromState(State) {
-    if (State && State.val && Number(State.val) != Number.NaN) {
+    if (State && State.val && !isNaN(Number(State.val))) {
       return Number(State.val);
     }
     return 0;
@@ -250,38 +250,7 @@ class valuetrackerovertime extends utils.Adapter {
 
       // only do something when enabled
       if (iobrokerObject && iobrokerObject.common && iobrokerObject.common.custom && iobrokerObject.common.custom[this.namespace] && iobrokerObject.common.custom[this.namespace].enabled) {
-        this.log.info("initial (enabled): " + iobrokerObject._id);
         const oS = new ObjectSettings(iobrokerObject, this.namespace);
-
-
-        //Check for duplicate Alias
-        for (const oneoSIdtoCheck in this.dicDatas) {
-          /**@type {ObjectSettings} */
-          const oStoCheck = this.dicDatas[oneoSIdtoCheck];
-          if (oStoCheck.alias.toLowerCase() == oS.alias.toLowerCase()) {
-            this.log.error("The Datapoint " + oS.id + " have the same Alias (" + oS.alias + ") as the Datapoint " + oStoCheck.id + ", " + oS.id + " is now disabled");
-            return;
-          }
-        }
-
-        //Do Subcribe and Create Objects
-        await this._generateTreeStructure(oS);
-        this.log.debug("subscribeForeignStates " + oS.id);
-        await this.subscribeStatesAsync(oS.alias + "._startValues.*");
-        await this.subscribeForeignStatesAsync(oS.id);
-
-
-        //Read out last good value
-        const currentval = await this._getNumberfromState(await this.getForeignStateAsync(oS.id));
-        const startDay = await this._getStartValue(oS, TimeFrames.Day);
-        if (currentval < startDay) {
-          oS.lastGoodValue = startDay;
-        }
-        else {
-          oS.lastGoodValue = currentval;
-        }
-
-
         //HistoryLoad
         if (oS.history_work) {
           iobrokerObject.common.custom[this.namespace].history_work = false;
@@ -290,8 +259,43 @@ class valuetrackerovertime extends utils.Adapter {
           await this._history_readDataFromHistory(oS);
           return;
         }
-        await this._publishCurrentValue(oS, new Date(), currentval);
-        this.dicDatas[oS.id] = oS;
+        if (iobrokerObject.common.custom[this.namespace].work !== undefined && !iobrokerObject.common.custom[this.namespace].work) {
+          this.log.info("not initial (work disabled)): " + iobrokerObject._id);
+        } else {
+          this.log.info("initial (enabled): " + iobrokerObject._id);
+          //Check for duplicate Alias
+          for (const oneoSIdtoCheck in this.dicDatas) {
+            /**@type {ObjectSettings} */
+            const oStoCheck = this.dicDatas[oneoSIdtoCheck];
+            if (oStoCheck.alias.toLowerCase() == oS.alias.toLowerCase()) {
+              this.log.error("The Datapoint " + oS.id + " have the same Alias (" + oS.alias + ") as the Datapoint " + oStoCheck.id + ", " + oS.id + " is now disabled");
+              return;
+            }
+          }
+
+          //Do Subcribe and Create Objects
+          await this._generateTreeStructure(oS);
+          this.log.debug("subscribeForeignStates " + oS.id);
+          await this.subscribeStatesAsync(oS.alias + "._startValues.*");
+          await this.subscribeForeignStatesAsync(oS.id);
+
+
+          //Read out last good value
+          const currentval = await this._getNumberfromState(await this.getForeignStateAsync(oS.id));
+          const startDay = await this._getStartValue(oS, TimeFrames.Day);
+          if (currentval < startDay) {
+            oS.lastGoodValue = startDay;
+          }
+          else {
+            oS.lastGoodValue = currentval;
+          }
+
+          await this._publishCurrentValue(oS, new Date(), currentval);
+          this.dicDatas[oS.id] = oS;
+
+        }
+
+
         this.log.debug("initial done " + iobrokerObject._id + " -> " + this.namespace + "." + oS.alias);
       }
     }
@@ -693,6 +697,7 @@ class valuetrackerovertime extends utils.Adapter {
       mydetailedObjectId = "." + date.getFullYear();
       await this._setExtendChannel(oS, mydetailedObjectId, String(date.getFullYear()), true);
       if (TimeFrame == TimeFrames.Infinite) {
+        //nothing to do
       }
       else if (TimeFrame == TimeFrames.Year) {
         mydetailedObjectId = mydetailedObjectId + "." + await this._getTimeFrameObjectID(TimeFrames.Year, date);
@@ -892,7 +897,7 @@ class valuetrackerovertime extends utils.Adapter {
       await this._setExtendObject(oS, startID, "start_" + TimeFrame, "", true, true, oS.iobrokerObject.common.unit, "number");
       //set startData if not set
       const state = await this.getStateAsync(oS.alias + startID);
-      if (state && state.val != null && Number(state.val) != Number.NaN) {
+      if (state && state.val != null && !isNaN(Number(state.val))) {
         oS.startValues[TimeFrame] = Number(state.val);
       }
       else {
