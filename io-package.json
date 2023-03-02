@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "news": {
+            "1.0.1": {
+                "en": "Enable Work -> for custom config # remove Pre Admin 5 support # add Translation # update dependencies # Git Actions instead of travis",
+                "de": "Arbeit aktivieren -> für benutzerdefinierte Konfiguration # Pre Admin 5-Unterstützung entfernen # Übersetzung hinzufügen # Abhängigkeiten aktualisieren # Git-Aktionen anstelle von travis",
+                "ru": "Включить работу -> для пользовательской конфигурации # удалить поддержку Pre Admin 5 # добавить перевод # обновить зависимости # Git Actions вместо travis",
+                "pt": "Habilitar Work -> para custom config # remove Pre Admin 5 support # add Translation # update dependencies # Git Actions ao invés de travis",
+                "nl": "Werk inschakelen -> voor aangepaste configuratie # verwijder Pre Admin 5-ondersteuning # voeg vertaling toe # update afhankelijkheden # Git-acties in plaats van travis",
+                "fr": "Activer le travail -> pour la configuration personnalisée # supprimer le support pré-admin 5 # ajouter la traduction # mettre à jour les dépendances # Git Actions au lieu de travis",
+                "it": "Enable Work -> for custom config # remove Pre Admin 5 support # add Translation # update dependencies # Git Actions invece di travis",
+                "es": "Habilitar trabajo -> para configuración personalizada # eliminar soporte Pre Admin 5 # agregar traducción # actualizar dependencias # Git Actions en lugar de travis",
+                "pl": "Włącz pracę -> dla niestandardowej konfiguracji # usuń wsparcie Pre Admin 5 # dodaj tłumaczenie # zaktualizuj zależności # Git Actions zamiast travis",
+                "uk": "Enable Work -> for custom config # remove Pre Admin 5 support # add Translation # update dependencies # Git Actions замість travis",
+                "zh-cn": "启用工作 -> 用于自定义配置 # 删除 Pre Admin 5 支持 # 添加翻译 # 更新依赖项 # Git Actions 而不是 travis"
+            },
             "1.0.0": {
                 "en": "Final version 1.0.0 with Infinite Counter",
                 "de": "Finalversion 1.0.0 mit Infinite Counter",
