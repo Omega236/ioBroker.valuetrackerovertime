@@ -24,7 +24,7 @@
     "url": "https://github.com/Omega236/ioBroker.valuetrackerovertime"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.7",
+    "@iobroker/adapter-core": "^2.6.8",
     "node-cron": "^3.0.2"
   },
   "globalDependencies": [
