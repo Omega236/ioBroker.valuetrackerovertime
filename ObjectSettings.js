@@ -1,5 +1,5 @@
 "use strict";
-const historyData = require("./historyData.js"); // eslint-disable-line no-use-before-define no-unused-vars
+const historyData = require("./historyData.js"); // eslint-disable-line no-unused-vars
 
 
 class ObjectSettings {
