@@ -90,7 +90,7 @@ class valuetrackerovertime extends utils.Adapter {
     this.crons.push(cron.schedule("0 0 1 * *", async () => {
       await this._timeFrameFinished(TimeFrames.Month);
     }));
-    this.crons.push(cron.schedule("0 0 1 */3 *", async () => {
+    this.crons.push(cron.schedule("0 0 1 1,4,7,10 *", async () => {
       await this._timeFrameFinished(TimeFrames.Quarter);
     }));
     this.crons.push(cron.schedule("0 0 1 1 *", async () => {
