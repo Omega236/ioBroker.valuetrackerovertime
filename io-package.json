@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "valuetrackerovertime",
-        "version": "1.0.1",
+        "version": "1.1.0",
         "news": {
+            "1.1.0": {
+                "en": "Fixing the annual quarter error and updates",
+                "de": "Korrektur des jährlichen Quartalsfehlers und Aktualisierungen",
+                "ru": "Исправление ошибки и обновления годового квартала",
+                "pt": "Corrigindo o erro de trimestre anual e atualizações",
+                "nl": "Vaststelling van de jaarlijkse kwartaalfout en updates",
+                "fr": "Correction de l'erreur trimestrielle annuelle et des mises à jour",
+                "it": "Risolvere l'errore e gli aggiornamenti del trimestre annuale",
+                "es": "Fijación del error y actualizaciones trimestrales anuales",
+                "pl": "Ustawienie błędu i aktualizacji kwartału rocznego",
+                "uk": "Виправлення річної помилки кварталу та оновлень",
+                "zh-cn": "纠正年度季度错误和更新"
+            },
             "1.0.1": {
                 "en": "Enable Work -> for custom config # remove Pre Admin 5 support # add Translation # update dependencies # Git Actions instead of travis",
                 "de": "Arbeit aktivieren -> für benutzerdefinierte Konfiguration # Pre Admin 5-Unterstützung entfernen # Übersetzung hinzufügen # Abhängigkeiten aktualisieren # Git-Aktionen anstelle von travis",
@@ -210,19 +223,6 @@
                 "pl": "pierwszy publiczny",
                 "uk": "перший",
                 "zh-cn": "首次公布"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "erstausstrahlung",
-                "ru": "начальный выпуск",
-                "pt": "lançamento inicial",
-                "nl": "niet",
-                "fr": "initial release",
-                "it": "rilascio iniziale",
-                "es": "liberación inicial",
-                "pl": "pierwsze wydanie",
-                "uk": "початковий реліз",
-                "zh-cn": "初步释放"
             }
         },
         "titleLang": {
@@ -277,7 +277,12 @@
         "supportCustoms": true,
         "dependencies": [
             {
-                "js-controller": ">=3.3.0"
+                "js-controller": ">=5.0.19"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=6.13.16"
             }
         ],
         "adminUI": {
