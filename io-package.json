@@ -2,6 +2,7 @@
     "common": {
         "name": "valuetrackerovertime",
         "version": "1.1.0",
+        "tier": 3,
         "news": {
             "1.1.0": {
                 "en": "Fixing the annual quarter error and updates",
@@ -93,136 +94,6 @@
                 "pl": "remove .toLocaleString (ang.)",
                 "uk": "оптимізація оперативної пам'яті (Remove .toLocaleString)",
                 "zh-cn": "优化分遣队(搬运地方旅)"
-            },
-            "0.5.3": {
-                "en": "bugfix startvalue not used after SQL read out",
-                "de": "bugfix Startwert nicht verwendet, nachdem SQL ausgelesen wurde",
-                "ru": "bugfix startvalue не используется после SQL читать",
-                "pt": "bugfix startvalue não usado após SQL ler",
-                "nl": "quality over Quantity Releases Vertaling:",
-                "fr": "bugfix startvalue not used after SQL read out",
-                "it": "bugfix startvalue non utilizzato dopo SQL leggere",
-                "es": "bugfix startvalue no utilizado después de que SQL leyera",
-                "pl": "zawartość błędów nie jest używana po odczytaniu SQL",
-                "uk": "javaScript licenses API Веб-сайт Go1.13.8",
-                "zh-cn": "b SQL宣读后未使用过的混合开端价值"
-            },
-            "0.5.2": {
-                "en": "bugfix _getObjectAsync not worked",
-                "de": "fehlerbehebung _get ObjectAsync nicht bearbeitet",
-                "ru": "багфикс _get ObjectAsync не работал",
-                "pt": "página inicial ObjectAsync não funcionou",
-                "nl": "quality over Quantity (QoQ) Releases Vertaling: ObjectAG",
-                "fr": "bugfix _get ObjectAsync non travaillé",
-                "it": "bugfix _get ObjectAsync non funziona",
-                "es": "bugfix _get ObjectAsync no funcionó",
-                "pl": "bugfix ObjectAsync nie pracuje",
-                "uk": "javaScript licenses API Веб-сайт Go1.13.8 Не працює",
-                "zh-cn": "bugfix_get 未作工作"
-            },
-            "0.5.1": {
-                "en": "optimizations, HistoryAnalyse extended and CurrentHistory added",
-                "de": "optimierungen, Geschichte Analyse erweitert und CurrentHistory hinzugefügt",
-                "ru": "оптимизация, история Анализ расширенной и текущейИстории добавлен",
-                "pt": "otimizações, História Analise estendido e CurrentHistory adicionado",
-                "nl": "vertaling: Analyse verlengd en CurrentHistory toegevoegd",
-                "fr": "optimisations, Histoire Analyse étendue et CurrentHistory ajouté",
-                "it": "ottimizzazioni, Storia Analizzare esteso e Storia Corrente aggiunto",
-                "es": "optimizaciones, Historia Analyse extended and CurrentHistory añadido",
-                "pl": "optymalizacja, historia. Analys i CurrentHistory dodają się dodatki",
-                "uk": "оптимізація, Історія Аналіз розширеної та поточногоІсторія додано",
-                "zh-cn": "优化历史 A. 扩大和目前的增添"
-            },
-            "0.4.1": {
-                "en": "bugfix DetailedYear not saved, bugfix HistoryDetailed not used Multi",
-                "de": "fehlerbehebung Jahr nicht gespeichert, Bugfix Geschichte Detail nicht verwendet Multi",
-                "ru": "bugfix Подробно Год не сохранен, bugfix История Детально не используется Multi",
-                "pt": "bugfix detalhado Ano não salvo, história do bugfix Detalhado não usado Multi",
-                "nl": "quality over Quantity (QoQ) Releases Vertaling: Jaar niet gered. Niet gebruikt Multi",
-                "fr": "bugfix détaillé Année non sauvegardée, bugfix Historique Détails non utilisés Multi",
-                "it": "bugfix dettagliato Anno non salvato, bugfix Storia Dettaglio non utilizzato Multi",
-                "es": "bugfix detallado Año no guardado, historia de bugfix Multi no utilizado",
-                "pl": "trąbka Rok nie został uratowany przez trąbka historia. Nieużywany w Multimedium",
-                "uk": "javaScript licenses API Веб-сайт Go1.13.8 Рік не збережений, історія помилок Детально не використовується багато",
-                "zh-cn": "b 细节 未挽救历史年 未使用多种语文的详细资料"
-            },
-            "0.4.0": {
-                "en": "HistoryAnalyseDetailed Added, Bugfix KW",
-                "de": "HistoryAnalyseDetails Hinzugefügt, Bugfix KW",
-                "ru": "ИсторияAnalyseDetailed Добавлено, Bugfix KW",
-                "pt": "HistoryAnalyseDetailed Adicionado, Bugfix KW",
-                "nl": "Vertaling:",
-                "fr": "HistoriqueAnalyseDetailed Added, Bugfix KW",
-                "it": "HistoryAnalyseInformazioni dettagliate, Bugfix KW",
-                "es": "HistoriaAnálisisDetallado, Bugfix KW",
-                "pl": "HistoryAnalyseDetailed Added, Bugfix KW",
-                "uk": "HistoryAnalyseDetailed, Бугфікс KW",
-                "zh-cn": "Analyse Detailed Added, Bugfix KW"
-            },
-            "0.3.5": {
-                "en": "reset Detection optimize and bugfix only ack",
-                "de": "zurück Erkennung Optimieren und Bugfix nur ack",
-                "ru": "сброс Обнаружение оптимизируйте и исправьте только ack",
-                "pt": "reset Detection otimizar e bugfix apenas ack",
-                "nl": "reset Detection optimidert en insectificatie enkel ack",
-                "fr": "reset Détection optimiser et bugfix seulement ack",
-                "it": "reset Rilevamento ottimizza e bugfix solo ack",
-                "es": "detección optimización y bugfix solo ack",
-                "pl": "reset Detection optymalizuje i trąba przytacza tylko akurat",
-                "uk": "скидання Оптимізація та виправлення помилок тільки",
-                "zh-cn": "重新确定最佳程度,并只包装"
-            },
-            "0.3.4": {
-                "en": "Check for duplicate Alias and reduce recalcs on start-value changed",
-                "de": "Überprüfen Sie doppelte Alias und reduzieren Sie Neuberechnungen auf Startwert geändert",
-                "ru": "Проверка на дублирование инопланетян и снижение пересчетов на старт-цене изменилось",
-                "pt": "Verifique para Alias duplicados e reduza os recalques no valor inicial alterado",
-                "nl": "Controleer op duplicaat Alias en verminder de recalcs bij start-valuatie veranderd",
-                "fr": "Vérifiez les Alias doubles et réduisez les recalcs sur la valeur de démarrage changée",
-                "it": "Controllare per duplicare Alias e ridurre i calcoli sul valore di avvio cambiato",
-                "es": "Comprobar por Alias duplicados y reducir los recalcos en valor inicial cambiado",
-                "pl": "Check do duplikacji Aliasa i zredukowania rekacalków zmieniły się na początku wartości",
-                "uk": "Перевірити для дублікатів Alias і зменшити перерахунок на початковому значення змінено",
-                "zh-cn": "重复Alias和减少开端价值的退税"
-            },
-            "0.3.3": {
-                "en": "bugfix date object changed",
-                "de": "bugfix datumsobjekt geändert",
-                "ru": "bugfix дата объект изменен",
-                "pt": "bugfix data object alterado",
-                "nl": "quality datum",
-                "fr": "bugfix date objet changé",
-                "it": "bugfix data oggetto cambiato",
-                "es": "objeto de la fecha de bugfix cambiado",
-                "pl": "obiekt zmienny",
-                "uk": "змінено помилку",
-                "zh-cn": "b 固定日期的改变"
-            },
-            "0.3.2": {
-                "en": "remove selectID.js in index_m.html",
-                "de": "entfernen ID.js in index_m.html",
-                "ru": "удалить выбрать ID.js в index_m.html",
-                "pt": "remover selecione ID.js in index_m.html",
-                "nl": "verwijder. IDJs index",
-                "fr": "supprimer ID.js in index_m.html",
-                "it": "rimuovere selezionare ID.js in index_m.html",
-                "es": "seleccione ID.js en index_m.html",
-                "pl": "usuwać ID.js in index_m.html",
-                "uk": "видалити вибір JavaScript licenses API Веб-сайт",
-                "zh-cn": "取消选择 ID.js at index_m.html"
-            },
-            "0.3.1": {
-                "en": "first public",
-                "de": "erste öffentlichkeit",
-                "ru": "первая публика",
-                "pt": "primeiro público",
-                "nl": "eerste publiek",
-                "fr": "premier public",
-                "it": "primo pubblico",
-                "es": "primer público",
-                "pl": "pierwszy publiczny",
-                "uk": "перший",
-                "zh-cn": "首次公布"
             }
         },
         "titleLang": {
@@ -260,9 +131,11 @@
             "history",
             "log data"
         ],
-        "license": "MIT",
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
         "platform": "Javascript/Node.js",
-        "main": "main.js",
         "icon": "valuetrackerovertime.png",
         "enabled": true,
         "extIcon": "https://raw.githubusercontent.com/Omega236/ioBroker.valuetrackerovertime/master/admin/valuetrackerovertime.png",
@@ -273,7 +146,6 @@
         "compact": true,
         "connectionType": "local",
         "dataSource": "poll",
-        "materialize": true,
         "supportCustoms": true,
         "dependencies": [
             {
