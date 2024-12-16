@@ -19,7 +19,12 @@
         "_info_Detailed_history": {
           "newLine": true,
           "type": "staticText",
-          "label": "Create seperate datapoints for every timeframe (useful for admin ui)"
+          "label": "Create seperate datapoints for every timeframe (useful for admin ui)",
+          "xs": 12,
+          "sm": 12,
+          "md": 12,
+          "lg": 12,
+          "xl": 12
         },
         "detailed_days": {
           "newLine": true,
@@ -96,7 +101,12 @@
         "_info_Detailed_current": {
           "newLine": true,
           "type": "staticText",
-          "label": "Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)"
+          "label": "Overrides Data after new Timeframe (useful for Scripts like PowerUsageOnMonday or PowerUsageInDecember)",
+          "xs": 12,
+          "sm": 12,
+          "md": 12,
+          "lg": 12,
+          "xl": 12
         },
         "detailed_current_days": {
           "newLine": true,
@@ -161,7 +171,12 @@
         "_info_current_previous_data": {
           "newLine": true,
           "type": "staticText",
-          "label": "-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear)"
+          "label": "-1 = no data collected (also no current), 0 = only current timeframe, > 0 the timeframes before (useful for Scripts like PowerUsageToday, PowerUsageYesterday or PowerUsageLastYear)",
+          "xs": 12,
+          "sm": 12,
+          "md": 12,
+          "lg": 12,
+          "xl": 12
         },
         "_sample_current_data": {
           "newLine": true,
@@ -184,7 +199,8 @@
           "sm": 3,
           "md": 3,
           "lg": 3,
-          "xl": 3        },
+          "xl": 3
+        },
         "before_minutes": {
           "newLine": true,
           "type": "number",
@@ -193,8 +209,8 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
-                   "defaultFunc": "instanceObj.native.before_minutes"
+          "xl": 2,
+          "defaultFunc": "instanceObj.native.before_minutes"
         },
         "before_hours": {
           "type": "number",
@@ -203,7 +219,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_hours"
         },
         "before_days": {
@@ -214,7 +230,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_days"
         },
         "before_weeks": {
@@ -224,7 +240,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_weeks"
         },
         "before_months": {
@@ -234,7 +250,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_months"
         },
         "before_quarters": {
@@ -244,7 +260,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_quarters"
         },
         "before_years": {
@@ -254,7 +270,7 @@
           "sm": 2,
           "md": 2,
           "lg": 2,
-          "xl": 2 ,
+          "xl": 2,
           "defaultFunc": "instanceObj.native.before_years"
         },
         "_header_Counter_reset_detection": {
@@ -266,7 +282,7 @@
           "sm": 12,
           "md": 12,
           "lg": 12,
-          "xl": 12 
+          "xl": 12
         },
         "counterResetDetection": {
           "newLine": true,
@@ -277,7 +293,7 @@
           "md": 3,
           "lg": 3,
           "xl": 3,
-                    "defaultFunc": "instanceObj.native.counterResetDetection"
+          "defaultFunc": "instanceObj.native.counterResetDetection"
         },
         "counterResetDetetion_CountAfterReset": {
           "type": "number",
