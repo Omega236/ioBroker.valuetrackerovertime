@@ -131,7 +131,10 @@
             "history",
             "log data"
         ],
-        "licenseInformation": "MIT",
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
         "platform": "Javascript/Node.js",
         "icon": "valuetrackerovertime.png",
         "enabled": true,
