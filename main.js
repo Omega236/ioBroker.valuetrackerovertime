@@ -764,7 +764,7 @@ class valuetrackerovertime extends utils.Adapter {
         } else if (TimeFrame == TimeFrames.Month) {
             return `${DateHelper.GetMonthNumber(theDate)}_${DateHelper.GetMonthName(theDate)}`;
         } else if (TimeFrame == TimeFrames.Quarter) {
-            return `quater_${await this._getQuarter(theDate)}`;
+            return `Quarter_${await this._getQuarter(theDate)}`;
         } else if (TimeFrame == TimeFrames.Year) {
             return `${TimeFramesNumber.Year}_Year_${theDate.getFullYear()}`;
         } else if (TimeFrame == TimeFrames.Infinite) {
