@@ -100,7 +100,7 @@ In the picture there are three examples given. Since the screenshot was taken on
 ## License
 MIT License
 
-Copyright (c) 2024 Omega236 <general.of.omega@googlemail.com>
+Copyright (c) 2024-2025 Omega236 <general.of.omega@googlemail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
