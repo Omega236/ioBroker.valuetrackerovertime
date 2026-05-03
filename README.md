@@ -97,6 +97,8 @@ In the picture there are three examples given. Since the screenshot was taken on
 ### 0.0.1
 * (Omega236) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 
